@@ -8,11 +8,11 @@
 
 #import "JHCommonPickerView.h"
 
-static const CGFloat kRowFontSize = 15;
+static const CGFloat kRowFontSize = 16;
 static const CGFloat kButtonHeight = 30.0f;
 static const CGFloat krowHeight = 30.0f;
 static const CGFloat kButtonWidth = 60.0f;
-static const CGFloat kpickerHeight = 150.0f;
+#define kpickerHeight kScreen_Height/3
 @interface JHCommonPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>
 
 @property(nonatomic,strong)SelectDataBlock block;
@@ -21,6 +21,7 @@ static const CGFloat kpickerHeight = 150.0f;
 @property (strong, nonatomic) UIView *backgroundView;
 /** 弹出视图 */
 @property (strong, nonatomic) UIPickerView *pickerView;
+@property (strong, nonatomic) UIView *btnBgView;
 /** button */
 @property (strong, nonatomic) UIButton *cancelButton;
 @property (strong, nonatomic) UIButton *certainButton;
@@ -62,19 +63,27 @@ static const CGFloat kpickerHeight = 150.0f;
     return _pickerView;
 }
 -(void)_creatButton{
-    _cancelButton = [[UIButton alloc]initWithFrame:CGRectMake(0, self.frame.size.height,kButtonWidth, kButtonHeight)];
-    [self addSubview:_cancelButton];
+    
+    _btnBgView = [[UIView alloc] initWithFrame:CGRectMake(0,self.frame.size.height,kButtonWidth, kButtonHeight)];
+    _btnBgView.backgroundColor = [UIColor colorWithHexString:@"F1F1F1"];
+    _btnBgView.alpha = 0.7;
+    [self addSubview:_btnBgView];
+    
+    _cancelButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0,kButtonWidth, kButtonHeight)];
+    [_btnBgView addSubview:_cancelButton];
     [_cancelButton setTitle:@"取消" forState:0];
+    [_cancelButton.titleLabel setFont: [UIFont systemFontOfSize:15]];
     [_cancelButton setTitleColor:[UIColor redColor] forState:0];
     
-    _cancelButton.alpha = 0.7;
+//    _cancelButton.alpha = 0.7;
     [_cancelButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
     
-    _certainButton = [[UIButton alloc]initWithFrame:CGRectMake(self.bounds.size.width-kButtonWidth,self.frame.size.height,kButtonWidth, kButtonHeight)];
-    [self addSubview:_certainButton];
+    _certainButton = [[UIButton alloc]initWithFrame:CGRectMake(self.bounds.size.width-kButtonWidth,0,kButtonWidth, kButtonHeight)];
+    [_btnBgView addSubview:_certainButton];
     [_certainButton setTitle:@"确定" forState:0];
+    [_certainButton.titleLabel setFont: [UIFont systemFontOfSize:15]];
     [_certainButton setTitleColor:[UIColor redColor] forState:0];
-    _certainButton.alpha = 0.7;
+//    _certainButton.alpha = 0.7;
     [_certainButton addTarget:self action:@selector(dismissWithCallback) forControlEvents:UIControlEventTouchUpInside];
 }
 //touch remove
@@ -114,8 +123,8 @@ static const CGFloat kpickerHeight = 150.0f;
         [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.7f initialSpringVelocity:0.7f options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.backgroundView.alpha = 1.0f;
             self.pickerView.frame = CGRectMake(0, self.frame.size.height-self.pickerView.frame.size.height, self.frame.size.width, self.pickerView.frame.size.height);
-            _certainButton.frame = CGRectMake(self.bounds.size.width-kButtonWidth, self.frame.size.height-self.pickerView.frame.size.height, self.certainButton.frame.size.width, self.certainButton.frame.size.height);
-            _cancelButton.frame = CGRectMake(0, self.frame.size.height-self.pickerView.frame.size.height, self.certainButton.frame.size.width, self.certainButton.frame.size.height);
+
+            _btnBgView.frame = CGRectMake(0, self.frame.size.height-self.pickerView.frame.size.height,  self.frame.size.width, self.certainButton.frame.size.height);
         } completion:nil];
     }];
 }
@@ -157,7 +166,7 @@ static const CGFloat kpickerHeight = 150.0f;
     return krowHeight;
 }
 -(NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component{
-    return _titleArray[row][@"text"];
+    return _titleArray[row][@"valueDesc"];
     
 }
 /**
@@ -166,7 +175,7 @@ static const CGFloat kpickerHeight = 150.0f;
 -(void)dismissWithCallback{
     if (self.block) {
         
-        _block(self.titleArray[[_pickerView selectedRowInComponent:0]][@"value"],self.titleArray[[_pickerView selectedRowInComponent:0]][@"text"]);
+        _block(self.titleArray[[_pickerView selectedRowInComponent:0]][@"keyWorld"],self.titleArray[[_pickerView selectedRowInComponent:0]][@"valueDesc"]);
     }
     [self dismiss];
 }
@@ -178,8 +187,7 @@ static const CGFloat kpickerHeight = 150.0f;
     [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.backgroundView.alpha = 0.0f;
         self.pickerView.frame = CGRectMake(0, self.frame.size.height, self.frame.size.width, self.pickerView.frame.size.height);
-        _certainButton.frame = CGRectMake(self.bounds.size.width-kButtonWidth, self.frame.size.height, self.certainButton.frame.size.width, self.certainButton.frame.size.height);
-        _cancelButton.frame = CGRectMake(0, self.frame.size.height, self.certainButton.frame.size.width, self.certainButton.frame.size.height);
+        _btnBgView.frame = CGRectMake(0, self.frame.size.height, self.frame.size.width, self.certainButton.frame.size.height);
     } completion:^(BOOL finished) {
         [self removeFromSuperview];
     }];
