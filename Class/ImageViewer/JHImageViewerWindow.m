@@ -99,10 +99,18 @@
     }];
 }
 /**
+ 设置单点消失事件
+ */
+-(void)_setOneTapDismissGesture{
+
+    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_cancelAction)];
+    [self addGestureRecognizer:_tap];
+}
+/**
  设置单点事件
  */
 -(void)_setOneTapGesture{
-#warning tap dismiss need condition
+
     _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_tapAction)];
     [self addGestureRecognizer:_tap];
 }
@@ -162,7 +170,7 @@
             _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _imageSize.width,_imageSize.height)];
         }else{
             
-            _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, kScreen_Width,kScreen_Height)];
+            _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, JHSCREENWIDTH,JHSCREENHEIGHT)];
         }
         _imageView.userInteractionEnabled = YES;
         _imageView.center = CGPointMake(JHSCREENWIDTH/2, JHSCREENHEIGHT/2);
@@ -223,7 +231,7 @@
  创建图片选择与取消的按钮
  */
 -(void)_setCancelAndCertainButton{
-    _navView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, kNavHeight)];
+    _navView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, JH_NavigationHeight)];
     _navView.backgroundColor = [UIColor colorWithRed:57/255.0 green:58/255.0 blue:62/255.0 alpha:1];
     [self addSubview:_navView];
     //取消按钮
