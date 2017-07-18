@@ -13,6 +13,8 @@ static const CGFloat kButtonHeight = 30.0f;
 static const CGFloat krowHeight = 30.0f;
 static const CGFloat kButtonWidth = 60.0f;
 #define kpickerHeight kScreen_Height/3
+#define kkeyword @"keyWorld"
+#define kkeyValue @"valueDesc"
 @interface JHCommonPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>
 
 @property(nonatomic,strong)SelectDataBlock block;
@@ -72,7 +74,7 @@ static const CGFloat kButtonWidth = 60.0f;
     _cancelButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0,kButtonWidth, kButtonHeight)];
     [_btnBgView addSubview:_cancelButton];
     [_cancelButton setTitle:@"取消" forState:0];
-    [_cancelButton.titleLabel setFont: [UIFont systemFontOfSize:15]];
+    [_cancelButton.titleLabel setFont: [UIFont systemFontOfSize:16]];
     [_cancelButton setTitleColor:[UIColor redColor] forState:0];
     
 //    _cancelButton.alpha = 0.7;
@@ -81,7 +83,7 @@ static const CGFloat kButtonWidth = 60.0f;
     _certainButton = [[UIButton alloc]initWithFrame:CGRectMake(self.bounds.size.width-kButtonWidth,0,kButtonWidth, kButtonHeight)];
     [_btnBgView addSubview:_certainButton];
     [_certainButton setTitle:@"确定" forState:0];
-    [_certainButton.titleLabel setFont: [UIFont systemFontOfSize:15]];
+    [_certainButton.titleLabel setFont: [UIFont systemFontOfSize:16]];
     [_certainButton setTitleColor:[UIColor redColor] forState:0];
 //    _certainButton.alpha = 0.7;
     [_certainButton addTarget:self action:@selector(dismissWithCallback) forControlEvents:UIControlEventTouchUpInside];
@@ -155,6 +157,7 @@ static const CGFloat kButtonWidth = 60.0f;
     }
     // Fill the label text here
     pickerLabel.text=[self pickerView:pickerView titleForRow:row forComponent:component];
+
     return pickerLabel;
 }
 // returns the # of rows in each component..
@@ -166,16 +169,17 @@ static const CGFloat kButtonWidth = 60.0f;
     return krowHeight;
 }
 -(NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component{
-    return _titleArray[row][@"valueDesc"];
+    return _titleArray[row][kkeyValue];
     
 }
+
 /**
  callback
  */
 -(void)dismissWithCallback{
     if (self.block) {
         
-        _block(self.titleArray[[_pickerView selectedRowInComponent:0]][@"keyWorld"],self.titleArray[[_pickerView selectedRowInComponent:0]][@"valueDesc"]);
+        _block(self.titleArray[[_pickerView selectedRowInComponent:0]][kkeyword],self.titleArray[[_pickerView selectedRowInComponent:0]][kkeyValue]);
     }
     [self dismiss];
 }

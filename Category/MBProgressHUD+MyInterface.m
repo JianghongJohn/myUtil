@@ -42,7 +42,7 @@
     hud.label.font = [UIFont systemFontOfSize:15];
     hud.label.numberOfLines = 0;
     //    hud.contentColor = [UIColor whiteColor];
-    hud.bezelView.backgroundColor = [UIColor blackColor];
+    hud.bezelView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.65];
     if (success) {
         //view
         hud.customView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(@"icon_success")]];
@@ -85,6 +85,8 @@
     hud.label.font = [UIFont systemFontOfSize:15];
     //    hud.contentColor = [UIColor whiteColor];
     hud.bezelView.backgroundColor = [UIColor blackColor];
+    //hide hud
+    [hud hideAnimated:YES afterDelay:2];
     return hud;
 
 }
