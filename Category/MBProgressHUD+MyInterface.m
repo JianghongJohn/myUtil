@@ -23,7 +23,7 @@
     hud.label.text = title;
     hud.label.font = [UIFont systemFontOfSize:15];
     //    hud.contentColor = [UIColor whiteColor];
-    hud.bezelView.backgroundColor = [UIColor blackColor];
+    hud.bezelView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.65];
     return hud;
 }
 /**
@@ -67,7 +67,7 @@
     hud.label.text = title;
     hud.label.font = [UIFont systemFontOfSize:15];
     //    hud.contentColor = [UIColor whiteColor];
-    hud.bezelView.backgroundColor = [UIColor blackColor];
+    hud.bezelView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.65];
     return hud;
 }
 /**
@@ -84,7 +84,7 @@
     hud.label.text = title;
     hud.label.font = [UIFont systemFontOfSize:15];
     //    hud.contentColor = [UIColor whiteColor];
-    hud.bezelView.backgroundColor = [UIColor blackColor];
+    hud.bezelView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.65];
     //hide hud
     [hud hideAnimated:YES afterDelay:2];
     return hud;

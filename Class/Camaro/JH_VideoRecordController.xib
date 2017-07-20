@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="JH_VideoRecordController">
+            <connections>
+                <outlet property="changeCameraBT" destination="B4l-jy-wkh" id="6AA-za-Htz"/>
+                <outlet property="flashLightBT" destination="owW-ed-aEZ" id="0mT-s6-Soz"/>
+                <outlet property="progressView" destination="x4B-A0-cJg" id="phJ-u3-9LZ"/>
+                <outlet property="recordBt" destination="OJ6-Sj-2re" id="EYE-yY-DPc"/>
+                <outlet property="recordNextBT" destination="57O-87-Oma" id="itV-iE-TGu"/>
+                <outlet property="topViewTop" destination="Ldf-4C-ASK" id="cxj-DS-NXf"/>
+                <outlet property="view" destination="Bom-ce-Ro2" id="Zd9-HL-QV2"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="Bom-ce-Ro2">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view alpha="0.30000001192092896" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xoz-hU-JJG">
+                    <rect key="frame" x="0.0" y="521" width="375" height="146"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="146" id="2fN-7h-ewq"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OJ6-Sj-2re">
+                    <rect key="frame" x="148" y="554" width="80" height="80"/>
+                    <state key="normal" image="0-录制按钮.png"/>
+                    <state key="selected" image="2-录制暂停按钮.png"/>
+                    <connections>
+                        <action selector="recordAction:" destination="-1" eventType="touchUpInside" id="0OA-Iv-CZ0"/>
+                    </connections>
+                </button>
+                <view alpha="0.30000001192092896" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="inh-bR-NRp">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="64"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="64" id="MTv-bc-CAt"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="57O-87-Oma">
+                    <rect key="frame" x="323" y="20" width="52" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="52" id="Xpp-Ej-dzY"/>
+                        <constraint firstAttribute="height" constant="44" id="hgJ-81-Fh6"/>
+                    </constraints>
+                    <state key="normal" image="0-下一步按钮－正常态.png"/>
+                    <state key="highlighted" image="videoNext#"/>
+                    <connections>
+                        <action selector="recordNextAction:" destination="-1" eventType="touchUpInside" id="MSR-9Q-hft"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B4l-jy-wkh">
+                    <rect key="frame" x="124" y="22" width="49" height="34"/>
+                    <state key="normal" image="0-前后摄像头置换按钮.png"/>
+                    <connections>
+                        <action selector="changeCameraAction:" destination="-1" eventType="touchUpInside" id="G3J-YI-eII"/>
+                    </connections>
+                </button>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x4B-A0-cJg" customClass="WCLRecordProgressView">
+                    <rect key="frame" x="0.0" y="516" width="375" height="5"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="5" id="CgV-IM-ds6"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="progressBgColor">
+                            <color key="value" red="0.72799396510000003" green="0.72797214980000002" blue="0.72798454759999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="progressColor">
+                            <color key="value" red="0.972296834" green="0.1877550781" blue="0.17929968239999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="progress">
+                            <real key="value" value="0.0"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ly3-1F-5VQ">
+                    <rect key="frame" x="0.0" y="20" width="52" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="JY4-D0-Fme"/>
+                        <constraint firstAttribute="width" constant="52" id="cP1-RN-MgC"/>
+                    </constraints>
+                    <state key="normal" image="0-关闭按钮－正常态.png"/>
+                    <state key="highlighted" image="closeVideo#"/>
+                    <connections>
+                        <action selector="dismissAction:" destination="-1" eventType="touchUpInside" id="5Mb-0r-IYI"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="owW-ed-aEZ">
+                    <rect key="frame" x="203" y="22" width="49" height="34"/>
+                    <state key="normal" image="0-闪光灯关.png"/>
+                    <state key="selected" image="0-闪光灯开.png"/>
+                    <connections>
+                        <action selector="flashLightAction:" destination="-1" eventType="touchUpInside" id="R7h-Pn-xFM"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="xoz-hU-JJG" firstAttribute="top" secondItem="x4B-A0-cJg" secondAttribute="bottom" id="8ya-Rj-r4m"/>
+                <constraint firstItem="OJ6-Sj-2re" firstAttribute="centerX" secondItem="xoz-hU-JJG" secondAttribute="centerX" id="DDf-61-RYy"/>
+                <constraint firstItem="OJ6-Sj-2re" firstAttribute="centerY" secondItem="xoz-hU-JJG" secondAttribute="centerY" id="GSz-O5-g4S"/>
+                <constraint firstItem="xoz-hU-JJG" firstAttribute="top" secondItem="x4B-A0-cJg" secondAttribute="bottom" id="H11-nA-GnJ"/>
+                <constraint firstItem="xoz-hU-JJG" firstAttribute="leading" secondItem="Bom-ce-Ro2" secondAttribute="leading" id="KL9-qv-Vht"/>
+                <constraint firstItem="inh-bR-NRp" firstAttribute="top" secondItem="Bom-ce-Ro2" secondAttribute="top" id="Ldf-4C-ASK"/>
+                <constraint firstAttribute="trailing" secondItem="xoz-hU-JJG" secondAttribute="trailing" id="MpJ-eT-0zT"/>
+                <constraint firstAttribute="trailing" secondItem="x4B-A0-cJg" secondAttribute="trailing" id="R2j-0B-a9W"/>
+                <constraint firstItem="Ly3-1F-5VQ" firstAttribute="leading" secondItem="inh-bR-NRp" secondAttribute="leading" id="T2X-gs-cQv"/>
+                <constraint firstAttribute="trailing" secondItem="inh-bR-NRp" secondAttribute="trailing" id="VS2-9n-xpd"/>
+                <constraint firstAttribute="bottom" secondItem="xoz-hU-JJG" secondAttribute="bottom" id="X0W-h1-Ngy"/>
+                <constraint firstItem="Ly3-1F-5VQ" firstAttribute="bottom" secondItem="inh-bR-NRp" secondAttribute="bottom" id="X8D-bG-hcE"/>
+                <constraint firstItem="x4B-A0-cJg" firstAttribute="leading" secondItem="Bom-ce-Ro2" secondAttribute="leading" id="YNv-HL-Fcd"/>
+                <constraint firstItem="owW-ed-aEZ" firstAttribute="centerY" secondItem="inh-bR-NRp" secondAttribute="centerY" constant="7" id="YZY-Ud-tL0"/>
+                <constraint firstItem="owW-ed-aEZ" firstAttribute="centerX" secondItem="inh-bR-NRp" secondAttribute="centerX" constant="39.5" id="YpC-sT-W4W"/>
+                <constraint firstItem="B4l-jy-wkh" firstAttribute="centerY" secondItem="inh-bR-NRp" secondAttribute="centerY" constant="7" id="cCQ-vg-hUb"/>
+                <constraint firstItem="57O-87-Oma" firstAttribute="trailing" secondItem="inh-bR-NRp" secondAttribute="trailing" id="dH3-NE-Hfm"/>
+                <constraint firstItem="inh-bR-NRp" firstAttribute="leading" secondItem="Bom-ce-Ro2" secondAttribute="leading" id="fIf-gr-dc4"/>
+                <constraint firstItem="57O-87-Oma" firstAttribute="bottom" secondItem="inh-bR-NRp" secondAttribute="bottom" id="iC3-Ma-XHI"/>
+                <constraint firstItem="B4l-jy-wkh" firstAttribute="centerX" secondItem="inh-bR-NRp" secondAttribute="centerX" constant="-39.5" id="mlI-dU-pkE"/>
+            </constraints>
+            <point key="canvasLocation" x="-43" y="-288"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="0-下一步按钮－正常态.png" width="11" height="21"/>
+        <image name="0-关闭按钮－正常态.png" width="18" height="18"/>
+        <image name="0-前后摄像头置换按钮.png" width="49" height="34"/>
+        <image name="0-录制按钮.png" width="80" height="80"/>
+        <image name="0-闪光灯关.png" width="49" height="34"/>
+        <image name="0-闪光灯开.png" width="49" height="34"/>
+        <image name="2-录制暂停按钮.png" width="80" height="80"/>
+        <image name="closeVideo#" width="18" height="18"/>
+        <image name="videoNext#" width="11" height="21"/>
+    </resources>
+</document>
