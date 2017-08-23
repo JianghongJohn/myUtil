@@ -8,7 +8,7 @@
 
 #import "JHActionSheet.h"
 
-@interface JH_ImagePickerSheet : NSObject<UINavigationBarDelegate,UIImagePickerControllerDelegate>
+@interface JH_ImagePickerSheet : NSObject<UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 /**
  创建imagePicker
  

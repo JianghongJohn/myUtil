@@ -8,8 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-typedef void(^CertainBlock)(UIImage *img) ;
+typedef void(^CertainBlock)(UIImage *image) ;
+typedef void(^DismissBlock)() ;
 @interface JHImageViewerWindow : UIView
+@property(nonatomic,copy)DismissBlock dismissBlock;
 @property(nonatomic,copy)CertainBlock block;
 
 - (instancetype)initWithFrame:(CGRect)frame WithImage:(UIImage *)image;
@@ -17,18 +19,8 @@ typedef void(^CertainBlock)(UIImage *img) ;
  init
  */
 - (instancetype)initWithFrame:(CGRect)frame WithImageUrl:(NSString *)imageUrl;
-
 /**
  创建图片选择与取消的按钮
  */
 -(void)_setCancelAndCertainButton;
-/**
- 设置单点消失事件
- */
-
--(void)_setOneTapDismissGesture;
-/**
- 设置双击事件
- */
--(void)_setDoubleTapGesture;
 @end

@@ -12,7 +12,7 @@ static const CGFloat kRowFontSize = 16;
 static const CGFloat kButtonHeight = 30.0f;
 static const CGFloat krowHeight = 30.0f;
 static const CGFloat kButtonWidth = 60.0f;
-#define kpickerHeight kScreen_Height/3
+#define kpickerHeight [UIScreen mainScreen].bounds.size.height/3
 #define kkeyword @"keyWorld"
 #define kkeyValue @"valueDesc"
 @interface JHCommonPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>

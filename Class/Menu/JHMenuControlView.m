@@ -29,8 +29,8 @@ static const CGFloat lineHeight = 2.0f;
         self.onePageCount = onePageCount;
         //设置颜色默认值
         self.backgroundColor = [UIColor whiteColor];
-        _normalFont = [UIFont systemFontOfSize:15];
-        _selectedFont = [UIFont systemFontOfSize:16];
+        _normalFont = [UIFont systemFontOfSize:14];
+        _selectedFont = [UIFont systemFontOfSize:15];
         _normalColor = [UIColor grayColor];
         _selectedColor = [UIColor redColor];
         _currentIndex = 0;
@@ -114,23 +114,24 @@ static const CGFloat lineHeight = 2.0f;
  */
 -(void)addChildViewController
 {
+    WeakSelf
     //viewController
     UIViewController *controller = _controllers[_currentIndex];
     
-    CGFloat startX = CGRectGetWidth(self.rootScrollView.bounds)*_currentIndex;
+    CGFloat startX = CGRectGetWidth(weakSelf.rootScrollView.bounds)*_currentIndex;
     if (!controller.parentViewController) {
-        [self.parentViewController addChildViewController:controller];
-        CGRect rect = self.rootScrollView.bounds;
+        [weakSelf.parentViewController addChildViewController:controller];
+        CGRect rect = weakSelf.rootScrollView.bounds;
         rect.origin.x = startX;
         controller.view.frame = CGRectMake(rect.origin.x, 0, rect.size.width, rect.size.height);
-        [self.rootScrollView addSubview:controller.view];
+        [weakSelf.rootScrollView addSubview:controller.view];
         //tell compiler endAddChildVC
-        [controller didMoveToParentViewController:self.parentViewController];
+        [controller didMoveToParentViewController:weakSelf.parentViewController];
 //        [self.rootScrollView setContentOffset:CGPointMake(startX, 0) animated:NO];
 //        return;
     }
     //scrollAnimate
-    [self.rootScrollView setContentOffset:CGPointMake(startX, 0) animated:NO];
+    [weakSelf.rootScrollView setContentOffset:CGPointMake(startX, 0) animated:NO];
     
 }
 
@@ -178,6 +179,13 @@ static const CGFloat lineHeight = 2.0f;
         self.lineView.frame = rect;
     }
 
+}
+-(void)setCurrentIndex:(NSInteger)currentIndex{
+    if (_currentIndex!=currentIndex) {
+        _currentIndex = currentIndex;
+        [self selectItemAtIndex:_currentIndex];
+    }
+    
 }
 /**
  *  主动设置cursor选中item
@@ -304,7 +312,6 @@ static const CGFloat lineHeight = 2.0f;
     cell.selected = NO;
 }
 
-
 #pragma mark - UICollectionViewDelegateFlowLayout
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -312,7 +319,7 @@ static const CGFloat lineHeight = 2.0f;
 //    NSString *title = _titles[indexPath.item];
 //    CGSize size = [title sizeWithAttributes:@{NSFontAttributeName:self.selectedFont}];
 //    size = CGSizeMake(size.width+36, CGRectGetHeight(self.bounds));
-    CGSize size = CGSizeMake(CGRectGetWidth(self.collectionView.frame)/3, CGRectGetHeight(self.collectionView.frame));
+    CGSize size = CGSizeMake(CGRectGetWidth(self.collectionView.frame)/self.onePageCount, CGRectGetHeight(self.collectionView.frame));
     return size;
 }
 
@@ -320,6 +327,12 @@ static const CGFloat lineHeight = 2.0f;
 {
     return UIEdgeInsetsMake(0, 0, 0, 0);
 }
-
+- (void)dealloc
+{
+    self.rootScrollView=nil;
+    self.collectionView=nil;
+    _controllers = nil;
+    
+}
 
 @end

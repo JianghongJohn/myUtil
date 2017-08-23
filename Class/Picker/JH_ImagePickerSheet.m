@@ -8,7 +8,7 @@
 
 #import "JH_ImagePickerSheet.h"
 #import "JH_RuntimeTool.h"
-#import "JH_PrivateHelper.h"
+
 @implementation JH_ImagePickerSheet
 
 /**
@@ -20,7 +20,7 @@
 -(void)_setImagePickerForClass:(UIViewController *)vc canEditing:(BOOL )canEdit{
     
 
-    JHActionSheet *action = [[JHActionSheet alloc] initWithTitle:@"选择照片" cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@[@"拍照",@"从手机相册选择"] handler:^(JHActionSheet *actionSheet, NSInteger index) {
+    JHActionSheet *action = [[JHActionSheet alloc] initWithTitle:nil cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@[@"拍照",@"从手机相册选择"] handler:^(JHActionSheet *actionSheet, NSInteger index) {
         //相机资源
         UIImagePickerControllerSourceType sourceType;
         
@@ -55,13 +55,7 @@
     
     
     if (sourceType == UIImagePickerControllerSourceTypeCamera) {//拍照
-        
-        //摄像头是否可用
-        BOOL isCamera = [UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear|UIImagePickerControllerCameraDeviceFront];
-        if (!isCamera) {
-            kTipAlert(@"该设备不支持拍照");
-            return nil;
-        }
+
         if (![JH_PrivateHelper checkCameraAuthorizationStatus]) {
             return nil;
         }
@@ -73,7 +67,6 @@
     }else{
         return nil;
     }
-    
     //调出相册
     picker.sourceType = sourceType;
     //动态添加协议

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-typedef void (^SelectDataBlock) (NSString * ,NSString *);
+typedef void (^SelectDataBlock) (NSString *key ,NSString *description);
 @interface JHCommonPickerView : UIView
 - (instancetype)initWithFrame:(CGRect)frame titleArray:(NSArray<NSDictionary *> *)titleArray handler:(SelectDataBlock)selectBlock;
 -(void)show;

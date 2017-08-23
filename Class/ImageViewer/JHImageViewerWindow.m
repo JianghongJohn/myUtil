@@ -16,6 +16,7 @@
 @property (nonatomic,strong)UIImageView *imageView;
 @property (nonatomic,strong)UIScrollView *scrollView;
 @property (nonatomic,strong)UITapGestureRecognizer *tap;
+@property (nonatomic,strong)UITapGestureRecognizer *doubleTap;
 @property (nonatomic,strong)UIView *navView;
 @end
 /**
@@ -32,8 +33,8 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self _setAttributeWithImage:image];
-//        [self _setOneTapGesture];
-//        [self _setDoubleTapGesture];
+        [self _setOneTapGesture];
+        [self _setDoubleTapGesture];
     }
     return self;
 }
@@ -62,12 +63,12 @@
     [self addSubview:self.scrollView];
     [self.scrollView addSubview:self.imageView];
     [self.imageView sd_setShowActivityIndicatorView:YES];
-    [self.imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:@"p1.jpg"] completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-        
-        weakSelf.imageSize = CGSizeMake(image.size.width, image.size.height);
-        weakSelf.imageView.frame = CGRectMake(0, 0, _imageSize.width,_imageSize.height);
-        [weakSelf remakeScale];
-    }];
+//    [self.imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:@"p1.jpg"] completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//        
+//        weakSelf.imageSize = CGSizeMake(image.size.width, image.size.height);
+//        weakSelf.imageView.frame = CGRectMake(0, 0, _imageSize.width,_imageSize.height);
+//        [weakSelf remakeScale];
+//    }];
     
     [UIView animateWithDuration:JH_UIViewAnimation animations:^{
         self.alpha = 1;
@@ -99,14 +100,6 @@
     }];
 }
 /**
- 设置单点消失事件
- */
--(void)_setOneTapDismissGesture{
-
-    _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_cancelAction)];
-    [self addGestureRecognizer:_tap];
-}
-/**
  设置单点事件
  */
 -(void)_setOneTapGesture{
@@ -118,27 +111,14 @@
  设置双击事件
  */
 -(void)_setDoubleTapGesture{
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_doubleTapAction)];
-    doubleTap.numberOfTapsRequired = 2;
+    _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_doubleTapAction)];
+    _doubleTap.numberOfTapsRequired = 2;
     //设置点击优先值
-    [_tap requireGestureRecognizerToFail:doubleTap];
-    [self addGestureRecognizer:doubleTap];
+    [_tap requireGestureRecognizerToFail:_doubleTap];
+    [self addGestureRecognizer:_doubleTap];
 }
 
-/**
- 双击
- */
--(void)_doubleTapAction{
-    CGFloat currentZoom  = _scrollView.zoomScale;
-    [UIView animateWithDuration:JH_UIViewAnimation animations:^{
-        if (currentZoom==_scrollView.maximumZoomScale) {
-            [_scrollView setZoomScale:_scrollView.minimumZoomScale];
-        }else{
-            [_scrollView setZoomScale:_scrollView.maximumZoomScale];
-        }
-    }];
-    
-}
+
 -(UIScrollView *)scrollView{
     if (_scrollView==nil) {
         _scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
@@ -170,7 +150,7 @@
             _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _imageSize.width,_imageSize.height)];
         }else{
             
-            _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, JHSCREENWIDTH,JHSCREENHEIGHT)];
+            _imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height)];
         }
         _imageView.userInteractionEnabled = YES;
         _imageView.center = CGPointMake(JHSCREENWIDTH/2, JHSCREENHEIGHT/2);
@@ -225,20 +205,38 @@
 //    return  CGSizeMake(width/scale, height/scale);
 }
 
-
-
+/**
+ 点击事件，关闭视图
+ */
+-(void)_tapAction{
+    _dismissBlock();
+}
+/**
+ 双击
+ */
+-(void)_doubleTapAction{
+    CGFloat currentZoom  = _scrollView.zoomScale;
+    [UIView animateWithDuration:JH_UIViewAnimation animations:^{
+        if (currentZoom==_scrollView.maximumZoomScale) {
+            [_scrollView setZoomScale:_scrollView.minimumZoomScale];
+        }else{
+            [_scrollView setZoomScale:_scrollView.maximumZoomScale];
+        }
+    }];
+    
+}
 /**
  创建图片选择与取消的按钮
  */
 -(void)_setCancelAndCertainButton{
     _navView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, JH_NavigationHeight)];
-    _navView.backgroundColor = [UIColor colorWithRed:57/255.0 green:58/255.0 blue:62/255.0 alpha:1];
+    _navView.backgroundColor = kBaseColor;
     [self addSubview:_navView];
     //取消按钮
     UIButton *cancelButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 20, 50, 40)];
     [cancelButton setTitle:@"取消" forState:0];
     [cancelButton setTitleColor:[UIColor whiteColor] forState:0];
-    [cancelButton addTarget:self action:@selector(_tapAction) forControlEvents:UIControlEventTouchUpInside];
+    [cancelButton addTarget:self action:@selector(_cancelAction) forControlEvents:UIControlEventTouchUpInside];
     [_navView addSubview:cancelButton];
     //确定按钮
     UIButton *certainButton = [[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-50, 20, 50, 40)];
@@ -247,8 +245,12 @@
     [certainButton addTarget:self action:@selector(_certainAction) forControlEvents:UIControlEventTouchUpInside];
     [_navView addSubview:certainButton];
     
-    [self _setOneTapGesture];
-    [self _setDoubleTapGesture];
+    [self removeGestureRecognizer:_tap];
+    //重置单击双击
+     _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_tapMoveAction)];
+    //设置点击优先值
+    [_tap requireGestureRecognizerToFail:_doubleTap];
+    [self addGestureRecognizer:_tap];
 }
 
 -(void)_cancelAction{
@@ -259,21 +261,21 @@
     }];
 }
 /**
+ 确定按钮，将block数据返回，用于执行事件
+ */
+-(void)_certainAction{
+    _block(self.imageView.image);
+    [self removeFromSuperview];
+}
+/**
  点击事件，关闭视图
  */
--(void)_tapAction{
+-(void)_tapMoveAction{
     [UIView animateWithDuration:JH_UIViewAnimation animations:^{
         _navView.top = _navView.top==0?-64:0;
     } completion:^(BOOL finished) {
         
     }];
     
-}
-/**
- 确定按钮，将block数据返回，用于执行事件
- */
--(void)_certainAction{
-    _block(self.imageView.image);
-    [self removeFromSuperview];
 }
 @end

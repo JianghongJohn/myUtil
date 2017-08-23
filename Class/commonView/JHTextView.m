@@ -16,7 +16,16 @@
 }
 -(void)awakeFromNib{
     [super awakeFromNib];
-    
+    self.type        = JHTextViewTypeNormal;
+    self.checkType   = JHTextViewCheckTypeNone;
+    self.limitLength = 0;
+    self.allowedEdit = YES;
+    //        self.backgroundColor = [UIColor lightGrayColor];
+   
+}
+-(void)layoutSubviews{
+    [super layoutSubviews];
+     [self _creatTextView];
 }
 #pragma mark - UI (creatSubView and layout)
 /**
@@ -35,7 +44,7 @@
         self.limitLength = limitLength;
         self.allowedEdit = allowedEdit;
 //        self.backgroundColor = [UIColor lightGrayColor];
-        [self _creatTextView];
+//        [self _creatTextView];
     }
     return self;
 }
@@ -49,17 +58,20 @@
  */
 -(void)_creatTextView{
     
-    _jhTextView = ({
-        UITextView *text = [[UITextView alloc] init];
-        text.font = [UIFont systemFontOfSize:15];
-        text.layer.cornerRadius = 5;
-        text.layer.borderWidth = 0.5;
-        text.layer.borderColor = [UIColor lightGrayColor].CGColor;
-        text.delegate = self;
-        text;
-    });
-    _jhTextView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:_jhTextView];
+    if (!_jhTextView) {
+        
+        _jhTextView = ({
+            UITextView *text = [[UITextView alloc] init];
+            text.font = [UIFont systemFontOfSize:15];
+            text.layer.cornerRadius = 5;
+            text.layer.borderWidth = 0.5;
+            text.layer.borderColor = [UIColor lightGrayColor].CGColor;
+            text.delegate = self;
+            text;
+        });
+        _jhTextView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:_jhTextView];
+    }
     if (!self.allowedEdit) {
         _jhTextView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
         _jhTextView.editable = NO;
@@ -195,7 +207,26 @@
     }
 }
 #pragma mark - utilMethod
-
+/**
+ 弹出提示
+ */
+-(void)_alertWithString:(NSString *)text{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:text preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        
+    }];
+    [alert addAction:action];
+    [[self viewController] presentViewController:alert animated:YES completion:nil];
+    
+    
+}
+-(UIViewController *)viewController{
+    UIResponder *response = self.nextResponder;
+    while (![response isKindOfClass:[UIViewController class]]) {
+        response = response.nextResponder;
+    }
+    return (UIViewController *)response;
+}
 -(void)setPlaceHold:(NSString *)placeHold{
     if (_placeHold!=placeHold) {
         _placeHold = placeHold;
@@ -217,25 +248,32 @@
     
 }
 
-/**
- 弹出提示
- */
--(void)_alertWithString:(NSString *)text{
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提示" message:text preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        
-    }];
-    [alert addAction:action];
-    [[self viewController] presentViewController:alert animated:YES completion:nil];
-    
+
+
+-(void)setType:(JHTextViewType)type{
+    if (_type!=type) {
+        _type = type;
+        [self _creatTextView];
+    }
     
 }
--(UIViewController *)viewController{
-    UIResponder *response = self.nextResponder;
-    while (![response isKindOfClass:[UIViewController class]]) {
-        response = response.nextResponder;
+-(void)setCheckType:(JHTextViewCheckType)checkType{
+    if (_checkType!=checkType) {
+        _checkType=checkType;
+        [self _creatTextView];
     }
-    return (UIViewController *)response;
+}
+-(void)setAllowedEdit:(BOOL)allowedEdit{
+    if (_allowedEdit!=allowedEdit) {
+        _allowedEdit = allowedEdit;
+        [self _creatTextView];
+    }
 }
 
+-(void)setLimitLength:(NSUInteger)limitLength{
+    if (_limitLength!=limitLength) {
+        _limitLength = limitLength;
+        [self _creatTextView];
+    }
+}
 @end

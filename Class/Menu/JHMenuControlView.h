@@ -17,7 +17,7 @@
 /**
  *  当前页面所在的controller，必须赋值
  */
-@property (nonatomic, strong) UIViewController *parentViewController;
+@property (nonatomic, weak) UIViewController *parentViewController;
 /**
  *  底部切换页面的容器高度
  */
@@ -26,11 +26,11 @@
 /**
  *  标题和显示的页面，数量必须相等。
  */
-@property (nonatomic, copy) NSArray *titles;
+@property (nonatomic, strong) NSArray *titles;
 /**
  *  所要添加的viewController的实例。绘制界面时，会将viewController的view添加在scrollView上
  */
-@property (nonatomic, copy) NSArray *controllers;
+@property (nonatomic, strong) NSArray *controllers;
 
 /**
  *  默认分别是 [UIColor redColor],[UIColor whiteColor]
@@ -65,4 +65,10 @@
  init
  */
 -(instancetype)initWithFrame:(CGRect)frame withParentViewController:(UIViewController *)parentVC withTitles:(NSArray *)titles withControllers:(NSArray *)controllers withOnePageCount:(NSInteger)onePageCount;
+/**
+ *  设置计算选中的item状态
+ *
+ *  @param indexPath indexPath
+ */
+-(void)selectItemAtIndexPath:(NSIndexPath*)indexPath;
 @end
