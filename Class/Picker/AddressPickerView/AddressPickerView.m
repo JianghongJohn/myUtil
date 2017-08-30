@@ -25,10 +25,12 @@
 @property (nonatomic ,strong) NSDictionary   * citysDict;/**< 所有城市的字典*/
 @property (nonatomic ,strong) NSDictionary   * areasDict;/**< 所有地区的字典*/
 
-
 @end
 @implementation AddressPickerView
-
+#define SELFSIZE self.bounds.size
+static CGFloat const TITLEHEIGHT = 40.0;
+static CGFloat const TITLEBUTTONWIDTH = 75.0;
+#define kPickerHeight [UIScreen mainScreen].bounds.size.height/3
 - (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:CGRectZero];
     if (self) {
@@ -37,7 +39,7 @@
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
         [self addSubview:self.backgroundView];
-
+        
         //加载地址数据源
         [self loadAddressData];
         //加载标题栏
@@ -54,22 +56,19 @@
     CGPoint point = [touch locationInView:self.backgroundView];
     if (!CGRectContainsPoint(self.addressPickerView.frame, point)&&!CGRectContainsPoint(self.titleBackgroundView.frame, point))
     {
-        [self showOrHide:NO];
+        [self hide];
     }
 }
 -(UIView *)backgroundView{
     if (!_backgroundView) {
         _backgroundView = [[UIView alloc] initWithFrame:self.frame];
-        _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        //        _backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _backgroundView.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.4f];
         _backgroundView.alpha = 0;
     }
     return  _backgroundView;
 }
-#define SELFSIZE self.bounds.size
-static CGFloat const TITLEHEIGHT = 40.0;
-static CGFloat const TITLEBUTTONWIDTH = 75.0;
-#define kPickerHeight [UIScreen mainScreen].bounds.size.height/3
+
 - (UIView *)titleBackgroundView{
     if (!_titleBackgroundView) {
         _titleBackgroundView = [[UIView alloc]initWithFrame:
@@ -111,8 +110,9 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
 - (UIPickerView *)addressPickerView{
     if (!_addressPickerView) {
         _addressPickerView = [[UIPickerView alloc]initWithFrame:
-                              CGRectMake(0, [UIScreen mainScreen].bounds.size.height+TITLEHEIGHT, SELFSIZE.width, kPickerHeight-TITLEHEIGHT)];
+                              CGRectMake(0, [UIScreen mainScreen].bounds.size.height+TITLEHEIGHT, SELFSIZE.width, kPickerHeight)];
         _addressPickerView.backgroundColor = [UIColor whiteColor];
+        //        _addressPickerView.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
         _addressPickerView.delegate = self;
         _addressPickerView.dataSource = self;
     }
@@ -135,7 +135,7 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
 - (void)loadAddressData{
     NSString * filePath = [[NSBundle mainBundle] pathForResource:@"address"
                                                           ofType:@"txt"];
-
+    
     NSError  * error;
     NSString * str22 = [NSString stringWithContentsOfFile:filePath
                                                  encoding:NSUTF8StringEncoding
@@ -154,7 +154,7 @@ static CGFloat const TITLEBUTTONWIDTH = 75.0;
     _provincesArr = [_dataDict objectForKey:@"p"];
     _citysDict    = [_dataDict objectForKey:@"c"];
     _areasDict    = [_dataDict objectForKey:@"a"];
-
+    
     _pArr         = [[NSMutableArray alloc]init];
     
     //省份模型数组加载各个省份模型
@@ -268,7 +268,7 @@ numberOfRowsInComponent:(NSInteger)component{
     {
         if (singleLine.frame.size.height < 1)
         {
-            singleLine.backgroundColor = [UIColor grayColor];
+            singleLine.backgroundColor = kBaseLineColor;
         }
     }
     UILabel* pickerLabel = (UILabel*)view;
@@ -297,8 +297,8 @@ numberOfRowsInComponent:(NSInteger)component{
     NSData  * jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     NSError * err;
     NSDictionary * dic = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                        options:NSJSONReadingMutableContainers
-                                                          error:&err];
+                                                         options:NSJSONReadingMutableContainers
+                                                           error:&err];
     if(err) {
         NSLog(@"json解析失败：%@",err);
         return nil;
@@ -311,6 +311,7 @@ numberOfRowsInComponent:(NSInteger)component{
 - (void)cancelBtnClicked{
     if ([_delegate respondsToSelector:@selector(cancelBtnClick)]) {
         [_delegate cancelBtnClick];
+        [self hide];
     }
 }
 
@@ -326,7 +327,7 @@ numberOfRowsInComponent:(NSInteger)component{
     
     CGFloat selfY = self.frame.origin.y;
     __block CGFloat selfkY = selfY;
-
+    
     if (isShow) {
         // 在主线程中处理,否则在viewDidLoad方法中直接调用,会先加本视图,后加控制器的视图到UIWindow上,导致本视图无法显示出来,这样处理后便会优先加控制器的视图到UIWindow上
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -351,24 +352,26 @@ numberOfRowsInComponent:(NSInteger)component{
         selfkY = [UIScreen mainScreen].bounds.size.height;
         
     }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:0.3 delay:0 usingSpringWithDamping:0.7f initialSpringVelocity:0.7f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.addressPickerView.frame = CGRectMake(0,selfkY+TITLEHEIGHT, self.bounds.size.width,kPickerHeight);
+            self.titleBackgroundView.frame = CGRectMake(0,selfkY, self.bounds.size.width,TITLEHEIGHT);
+            if (isShow) {
+                
+                self.backgroundView.alpha = 1.0f;
+            }else{
+                
+                self.backgroundView.alpha = 0.0f;
+            }
+        } completion:^(BOOL finished) {
+            if (isShow) {
+                
+            }else{
+                [self removeFromSuperview];
+            }
+        }];
+    });
     
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.7f initialSpringVelocity:0.7f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.addressPickerView.frame = CGRectMake(0,selfkY+TITLEHEIGHT, self.bounds.size.width,kPickerHeight-TITLEHEIGHT);
-        self.titleBackgroundView.frame = CGRectMake(0,selfkY, self.bounds.size.width,TITLEHEIGHT);
-        if (isShow) {
-            
-            self.backgroundView.alpha = 1.0f;
-        }else{
-            
-            self.backgroundView.alpha = 0.0f;
-        }
-    } completion:^(BOOL finished) {
-        if (isShow) {
-
-        }else{
-            [self removeFromSuperview];
-        }
-    }];
     
 }
 
@@ -392,6 +395,7 @@ numberOfRowsInComponent:(NSInteger)component{
         [_delegate sureBtnClickReturnProvince:p.name
                                          City:c.cityName
                                          Area:c.areas[selectArea]];
+        [self hide];
     }
 }
 
