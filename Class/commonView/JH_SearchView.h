@@ -9,7 +9,18 @@
 #import <UIKit/UIKit.h>
 @class JH_SearchView;
 @protocol JHDIYSearchBarFDelegate <NSObject>
-
+/**
+ 当开始编辑的代理
+ 
+ @param searchbar JH_SearchView
+ */
+-(void)_searchTextDidBeginEditing:(JH_SearchView *)searchbar;
+/**
+ 当结束编辑的代理
+ 
+ @param searchbar JH_SearchView
+ */
+-(void)_searchTextDidEndEditing:(JH_SearchView *)searchbar;
 /**
  当输入文字改变的代理
 

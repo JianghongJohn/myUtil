@@ -24,7 +24,8 @@
         self.delegate = self;
         self.placeholder = placehold;
         //设置渲染颜色，让取消和搜索变颜色
-//        self.tintColor = [UIColor redColor];
+        self.tintColor = kBaseColor;
+        self.backgroundImage = [UIImage imageWithColor:[UIColor whiteColor] withRect:frame];
         [self _DIYAttribute];
     }
     return self;
@@ -41,31 +42,33 @@
     searchField.layer.borderColor = kBaseBGColor.CGColor;
     searchField.layer.borderWidth = 1;
     searchField.layer.masksToBounds = YES;
-    
-    for (UIView *subview in self.subviews) {
-        if ([subview isKindOfClass:[UIView class]]) {
-            for (UIView *nextView in subview.subviews) {
-                
-                if ([nextView isKindOfClass:NSClassFromString(@"UISearchBarBackground")]) {
-                    [nextView removeFromSuperview];
-
-                }
-                /**
-                 *  //实验证明此位置在遍历时执行顺序在background后
-                 *  @param @"UINavigationButton"
-                 *  @return 修改系统控件
-                 */
-//                if ([nextView isKindOfClass:NSClassFromString(@"UINavigationButton")]) {
-//                    UIButton *button = (UIButton *)nextView;
-//                    [button setTitle:@"取消" forState:0];
-//                    break;
+    searchField.backgroundColor = kBaseBGColor;
+//    for (UIView *subview in self.subviews) {
+//        if ([subview isKindOfClass:[UIView class]]) {
+//            for (UIView *nextView in subview.subviews) {
+//                
+//                if ([nextView isKindOfClass:NSClassFromString(@"UISearchBarBackground")]) {
+//                    [nextView removeFromSuperview];
+//
 //                }
-            }
-        }
-    }
+//                /**
+//                 *  //实验证明此位置在遍历时执行顺序在background后
+//                 *  @param @"UINavigationButton"
+//                 *  @return 修改系统控件
+//                 */
+////                if ([nextView isKindOfClass:NSClassFromString(@"UINavigationButton")]) {
+////                    UIButton *button = (UIButton *)nextView;
+////                    [button setTitle:@"取消" forState:0];
+////                    break;
+////                }
+//            }
+//        }
+//    }
     
 }
-
+/**
+ 文字编辑开始
+ */
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar;{
     //清空输入文字
     self.showsCancelButton = YES;
@@ -79,11 +82,21 @@
                  */
                 if ([nextView isKindOfClass:NSClassFromString(@"UINavigationButton")]) {
                     _searchButton = (UIButton *)nextView;
-                    [_searchButton setTitle:@"取消" forState:0];
+                    //判断是否有文字
+                    if (searchBar.text.length==0) {
+                        [_searchButton setTitle:@"取消" forState:0];
+                    }
+                    else{
+                         [_searchButton setTitle:@"搜索" forState:0];
+                        }
                     break;
                 }
             }
         }
+    }
+    //实现代理
+    if ([self.JHdelegate respondsToSelector:@selector(_searchTextDidBeginEditing:)]) {
+        [self.JHdelegate _searchTextDidBeginEditing:self];
     }
 }// called when text starts editing
 /**
@@ -91,6 +104,10 @@
  */
 - (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar;   {
     self.showsCancelButton = NO;
+    //实现代理
+    if ([self.JHdelegate respondsToSelector:@selector(_searchTextDidEndEditing:)]) {
+        [self.JHdelegate _searchTextDidEndEditing:self];
+    }
 }
 /**
  监控输入文字变化，改变取消与搜索状态
@@ -99,14 +116,14 @@
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText;{
 
     //判断是否有文字
-//    if (searchBar.text.length==0) {
-//        [_searchButton setTitle:@"取消" forState:0];
-//    }else{
-//        if (![_searchButton.titleLabel.text isEqualToString:@"搜索"]) {
-//            
-//            [_searchButton setTitle:@"搜索" forState:0];
-//        }
-//    }
+    if (searchBar.text.length==0) {
+        [_searchButton setTitle:@"取消" forState:0];
+    }else{
+        if (![_searchButton.titleLabel.text isEqualToString:@"搜索"]) {
+            
+            [_searchButton setTitle:@"搜索" forState:0];
+        }
+    }
     //实现代理
     if ([self.JHdelegate respondsToSelector:@selector(_searchTextDidChange:)]) {
         [self.JHdelegate _searchTextDidChange:self];
