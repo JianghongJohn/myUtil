@@ -7,7 +7,7 @@
 //
 
 #import "JH_MJTableView.h"
-#import <MJRefresh.h>
+
 
 @interface JH_MJTableView()
 @end
@@ -15,18 +15,6 @@
 {
     NSInteger _page;
     //    ODRefreshControl *_refreshControl;
-}
-
-
--(instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style{
-    self = [super initWithFrame:frame style:style];
-    if (self) {
-        self.showsVerticalScrollIndicator = NO;
-        [self _setRefresh];
-        //        [self _setMJRefreshHeader];
-        //        [self addODRefresh];
-    }
-    return self;
 }
 
 /**
@@ -51,13 +39,14 @@
     }
 }
 -(void)_setAutoFooter{
-    WeakSelf
-    MJRefreshFooter *footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-        if ([weakSelf.JHDelegate respondsToSelector:@selector(JH_MJTableViewLoadMore)]) {
-            [weakSelf.JHDelegate JH_MJTableViewLoadMore];
+    
+    MJRefreshAutoStateFooter *footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        if ([self.JHDelegate respondsToSelector:@selector(JH_MJTableViewLoadMore)]) {
+            [self.JHDelegate JH_MJTableViewLoadMore];
         }
     }];
-    
+    footer.stateLabel.font = [UIFont systemFontOfSize:12];
+    [footer setSize:CGSizeMake(self.width, 25)];
     self.mj_footer = footer;
 }
 //添加刷新部件头部
@@ -66,16 +55,15 @@
     //样式二：设置多张图片（有动画效果）
     NSArray *idleImages = [NSArray arrayWithObjects:
                            
-                           [UIImage imageNamed:@"car2"],
+                           [UIImage imageNamed:@"车1"],
                            
                            nil];
     
     NSArray *pullingImages = [NSArray arrayWithObjects:
-                              [UIImage imageNamed:@"car1"],
-                              [UIImage imageNamed:@"car2"],nil];
+                              [UIImage imageNamed:@"车1"],nil];
     NSArray *refreshingImages = [NSArray arrayWithObjects:
-                                 [UIImage imageNamed:@"car1"],
-                                 [UIImage imageNamed:@"car2"],nil];
+                                 [UIImage imageNamed:@"车1"],
+                                 [UIImage imageNamed:@"车"],nil];
     __weak typeof(self) weakSelf = self;
     MJRefreshGifHeader *header = [MJRefreshGifHeader headerWithRefreshingBlock:^{
         _page = 0;
@@ -83,6 +71,7 @@
             [weakSelf.JHDelegate JH_MJTableViewFresh];
         }
     }];
+    
     header.stateLabel.textColor = [UIColor lightGrayColor];
     //-------以上是使用block方法【不包含animationRefresh方法】,动画设置在上面的部分代码---------
     
@@ -115,22 +104,14 @@
  */
 -(void)setFooter{
     NSArray *idleImages = [NSArray arrayWithObjects:
-                           [UIImage imageNamed:@"wheel1@2x.png"],
-                           [UIImage imageNamed:@"wheel2@2x.png"],
-                           [UIImage imageNamed:@"wheel1@2x.png"],
-                           [UIImage imageNamed:@"wheel2@2x.png"],
-                           [UIImage imageNamed:@"wheel1@2x.png"],
-                           [UIImage imageNamed:@"wheel2@2x.png"],
-                           [UIImage imageNamed:@"wheel1@2x.png"],
-                           [UIImage imageNamed:@"wheel2@2x.png"],
+                           [UIImage imageNamed:@"车1"],
                            nil];
     
     NSArray *pullingImages = [NSArray arrayWithObjects:
-                              [UIImage imageNamed:@"wheel1@2x.png"],
-                              [UIImage imageNamed:@"wheel2@2x.png"],nil];
+                              [UIImage imageNamed:@"车1"],nil];
     NSArray *refreshingImages = [NSArray arrayWithObjects:
-                                 [UIImage imageNamed:@"wheel1@2x.png"],
-                                 [UIImage imageNamed:@"wheel2@2x.png"],nil];
+                                 [UIImage imageNamed:@"车1"],
+                                 [UIImage imageNamed:@"车"],nil];
     __weak typeof(self) weakSelf = self;
     MJRefreshBackGifFooter *footer = [MJRefreshBackGifFooter footerWithRefreshingBlock:^{
         _page ++;
@@ -145,12 +126,11 @@
     [footer setImages:pullingImages forState:MJRefreshStatePulling];
     // Set the refreshing state of animated images
     [footer setImages:refreshingImages forState:MJRefreshStateRefreshing];
-    
+    [footer.stateLabel setFont:[UIFont systemFontOfSize:10]];
     // Set title
     [footer setTitle:@"上拉加载更多" forState:MJRefreshStateIdle];
     [footer setTitle:@"放开开始加载" forState:MJRefreshStatePulling];
     [footer setTitle:@"正在加载数据" forState:MJRefreshStateRefreshing];
-    
     // Set footer
     self.mj_footer = footer;
 }
@@ -178,7 +158,7 @@
         case JHRefreshStateFooterNoMore:
             [self.mj_footer endRefreshing];
             [self.mj_footer endRefreshingWithNoMoreData];
-            [self.mj_footer setHidden:YES];
+            [self.mj_footer setHidden:NO];
             break;
         default:
             [self.mj_header endRefreshing];
@@ -193,7 +173,51 @@
 -(void)loadDataByPage:(NSString *)page rows:(NSString *)rows urlString:(NSString *)urlString data:(NSDictionary *)data newDataHandle:(void(^)(id))newDataBlock{
     
 }
-
+/**
+ 获取刷新样式
+ */
++(MJRefreshGifHeader *)getGifHeader:(void(^)())refreshingBlock{
+    //样式二：设置多张图片（有动画效果）
+    NSArray *idleImages = [NSArray arrayWithObjects:
+                           
+                           [UIImage imageNamed:@"车1"],
+                           
+                           nil];
+    
+    NSArray *pullingImages = [NSArray arrayWithObjects:
+                              [UIImage imageNamed:@"车1"],nil];
+    NSArray *refreshingImages = [NSArray arrayWithObjects:
+                                 [UIImage imageNamed:@"车1"],
+                                 [UIImage imageNamed:@"车"],nil];
+    
+    MJRefreshGifHeader *header = [MJRefreshGifHeader headerWithRefreshingBlock:^{
+        refreshingBlock();
+    }];
+    header.stateLabel.textColor = [UIColor lightGrayColor];
+    //-------以上是使用block方法【不包含animationRefresh方法】,动画设置在上面的部分代码---------
+    
+    //1.设置普通状态的动画图片
+    [header setImages:idleImages forState:MJRefreshStateIdle];
+    //2.设置即将刷新状态的动画图片（一松开就会刷新的状态）
+    [header setImages:pullingImages forState:MJRefreshStatePulling];
+    //3.设置正在刷新状态的动画图片
+    [header setImages:refreshingImages duration:0.3 forState:MJRefreshStateRefreshing];
+    //    [header setImages:refreshingImages forState:MJRefreshStateRefreshing];
+    
+    //    // Set title
+    [header setTitle:@"下拉刷新数据" forState:MJRefreshStateIdle];
+    [header setTitle:@"释放即可刷新" forState:MJRefreshStatePulling];
+    [header setTitle:@"努力加载中..." forState:MJRefreshStateRefreshing];
+    //    //设置字体大小
+    //    header.stateLabel.font = [UIFont systemFontOfSize:6];
+    
+    // 隐藏更新时间
+    header.lastUpdatedTimeLabel.hidden = YES;
+    
+    // 隐藏刷新状态
+    //    header.stateLabel.hidden = YES;
+    return header;
+}
 
 
 @end

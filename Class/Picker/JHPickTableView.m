@@ -12,6 +12,9 @@ static const CGFloat kRowFontSize = 15;
 static const CGFloat ksearchBarHeight = 44.0f;
 static const CGFloat krowHeight = 44.0f;
 static const CGFloat ktableHeight = 200.0f;
+//#define ktableHeight  /3
+#define kkeyword @"keyWorld"
+#define kkeyValue @"valueDesc"
 static  NSString *ktableCellIdentify = @"JHPickTableCell";
 //将数据更改为text和key
 @interface JHPickTableView()<UITableViewDelegate,UITableViewDataSource,JHDIYSearchBarFDelegate>
@@ -128,7 +131,7 @@ static  NSString *ktableCellIdentify = @"JHPickTableCell";
         cell =[[ UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:ktableCellIdentify];
     }
     //set title
-    cell.textLabel.text          = self.searchDataArray? self.searchDataArray[indexPath.row][@"valuedesc"]:self.dataArray[indexPath.row][@"valuedesc"];
+    cell.textLabel.text          = self.searchDataArray? self.searchDataArray[indexPath.row][kkeyValue]:self.dataArray[indexPath.row][kkeyValue];
     cell.textLabel.font          = [UIFont systemFontOfSize:kRowFontSize];
     cell.textLabel.center        = cell.contentView.center;
     cell.textLabel.textAlignment = NSTextAlignmentCenter;
@@ -142,7 +145,8 @@ static  NSString *ktableCellIdentify = @"JHPickTableCell";
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     if (self.block) {
         
-        _block(self.searchDataArray?[NSString stringWithFormat:@"%@",self.searchDataArray[indexPath.row][@"id"]]:[NSString stringWithFormat:@"%@",self.dataArray[indexPath.row][@"id"]],self.searchDataArray?self.searchDataArray[indexPath.row][@"valuedesc"]:self.dataArray[indexPath.row][@"valuedesc"]);
+        _block(self.searchDataArray?[NSString stringWithFormat:@"%@",self.searchDataArray[indexPath.row][kkeyword]]:[NSString stringWithFormat:@"%@",self.dataArray[indexPath.row][kkeyword]],
+               self.searchDataArray?self.searchDataArray[indexPath.row][kkeyValue]:self.dataArray[indexPath.row][kkeyValue]);
     }
     [self dismiss];
 }
@@ -189,6 +193,22 @@ static  NSString *ktableCellIdentify = @"JHPickTableCell";
     
 }
 /**
+ 当开始编辑的代理
+ 
+ @param searchbar JH_SearchView
+ */
+-(void)_searchTextDidBeginEditing:(JH_SearchView *)searchbar;{
+    
+}
+/**
+ 当结束编辑的代理
+ 
+ @param searchbar JH_SearchView
+ */
+-(void)_searchTextDidEndEditing:(JH_SearchView *)searchbar;{
+    
+}
+/**
  根据关键字查询数组
  @param data 输入数组
  @param key 关键字查询
@@ -196,7 +216,7 @@ static  NSString *ktableCellIdentify = @"JHPickTableCell";
 -(NSArray *)_searchData:(NSArray *)data returnDataByKey:(NSString *)key{
     NSMutableArray *finalData = [[NSMutableArray alloc]init];
     for (NSDictionary *dic in data) {
-        if ([dic[@"valuedesc"] containsString:key]) {
+        if ([dic[kkeyValue] containsString:key]) {
             [finalData addObject:dic];
         }
     }

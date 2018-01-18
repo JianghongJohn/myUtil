@@ -143,12 +143,12 @@
  */
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar __TVOS_PROHIBITED; {
     [self resignFirstResponder];
-//    if (searchBar.text.length==0) {
-//        //取消
-//    }else{
-//        //搜索
-//        [self search];
-//    }
+    if (searchBar.text.length==0) {
+        //取消
+    }else{
+        //搜索
+        [self search];
+    }
 }
 
 /**

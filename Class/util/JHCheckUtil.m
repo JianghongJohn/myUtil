@@ -65,19 +65,6 @@
     }
     
 }
-#pragma 正则匹配用户身份证号15或18位
-//+ (BOOL)checkUserIdCard: (NSString *) idCard{
-//    BOOL flag;
-//    if (idCard.length <= 0) {
-//        flag = NO;
-//        return flag;
-//    }
-//    NSString *regex2 = @"(\\d{15}$)|((\\d{17})(\\d|[xX]))";
-//    NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex2];
-//    BOOL isMatch = [pred evaluateWithObject:idCard];
-//    return isMatch;
-//    
-//}
 
 #pragma 正则匹配用户身份证号18位和15位
 + (BOOL)checkUserIdCard: (NSString *) idCard{
@@ -86,9 +73,9 @@
         return NO;
     }
     if ([idCard length] == 15) {
-            NSString *regex2 = @"\\d{15}$";
-            NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex2];
-            BOOL isMatch = [pred evaluateWithObject:idCard];
+        NSString *regex2 = @"\\d{15}$";
+        NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex2];
+        BOOL isMatch = [pred evaluateWithObject:idCard];
         return isMatch;
     }
     NSString *mmdd = @"(((0[13578]|1[02])(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)(0[1-9]|[12][0-9]|30))|(02(0[1-9]|[1][0-9]|2[0-8])))";
@@ -105,14 +92,16 @@
     if (![regexTest evaluateWithObject:idCard]) {
         return NO;
     }
-    int summary = ([idCard substringWithRange:NSMakeRange(0,1)].intValue + [idCard substringWithRange:NSMakeRange(10,1)].intValue) *7
+    int summary =
+    ([idCard substringWithRange:NSMakeRange(0,1)].intValue + [idCard substringWithRange:NSMakeRange(10,1)].intValue) *7
     + ([idCard substringWithRange:NSMakeRange(1,1)].intValue + [idCard substringWithRange:NSMakeRange(11,1)].intValue) *9
     + ([idCard substringWithRange:NSMakeRange(2,1)].intValue + [idCard substringWithRange:NSMakeRange(12,1)].intValue) *10
     + ([idCard substringWithRange:NSMakeRange(3,1)].intValue + [idCard substringWithRange:NSMakeRange(13,1)].intValue) *5
     + ([idCard substringWithRange:NSMakeRange(4,1)].intValue + [idCard substringWithRange:NSMakeRange(14,1)].intValue) *8
     + ([idCard substringWithRange:NSMakeRange(5,1)].intValue + [idCard substringWithRange:NSMakeRange(15,1)].intValue) *4
     + ([idCard substringWithRange:NSMakeRange(6,1)].intValue + [idCard substringWithRange:NSMakeRange(16,1)].intValue) *2
-    + [idCard substringWithRange:NSMakeRange(7,1)].intValue *1 + [idCard substringWithRange:NSMakeRange(8,1)].intValue *6
+    + [idCard substringWithRange:NSMakeRange(7,1)].intValue *1
+    + [idCard substringWithRange:NSMakeRange(8,1)].intValue *6
     + [idCard substringWithRange:NSMakeRange(9,1)].intValue *3;
     NSInteger remainder = summary % 11;
     NSString *checkBit = @"";
@@ -120,8 +109,39 @@
     checkBit = [checkString substringWithRange:NSMakeRange(remainder,1)];// 判断校验位
     return [checkBit isEqualToString:[[idCard substringWithRange:NSMakeRange(17,1)] uppercaseString]];
 }
-
-
+#pragma 正则匹配密码8-16位大小写字母、符号和数字的组合，请至少选择两种类型
++ (BOOL)checkPassword: (NSString *) password{
+    if ([password containsString:@" "]) {
+        DLog(@"不能有空格");
+        return NO;
+    }
+    NSString *regex = @"^(?=.*[a-zA-Z0-9].*)(?=.*[a-zA-Z\\W].*)(?=.*[0-9\\W].*).{8,16}$";
+    //        NSString *regex = @"^(?:([a-z])|([A-Z])|([0-9])|(.)){8,16}|(.)+$";
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex];
+    BOOL isMatch = [pred evaluateWithObject:password];
+    return isMatch;
+}
+#pragma 正则匹配银行卡号是否正确
++ (BOOL) checkBankNumber:(NSString *) bankNumber{
+    NSString *bankNum=@"^([0-9]{16}|[0-9]{19})$";
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",bankNum];
+    BOOL isMatch = [pred evaluateWithObject:bankNumber];
+    return isMatch;
+}
+#pragma 正则匹配17位车架号
++ (BOOL) checkCheJiaNumber:(NSString *) CheJiaNumber{
+    NSString *bankNum=@"^([0-9A-Z]){17}$";
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",bankNum];
+    BOOL isMatch = [pred evaluateWithObject:CheJiaNumber];
+    return isMatch;
+}
+#pragma 车牌号验证
++ (BOOL) checkCarNumber:(NSString *) CarNumber{
+    NSString *bankNum = @"^[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z_0-9]{4}[A-Z_0-9_\u4e00-\u9fa5]$";
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",bankNum];
+    BOOL isMatch = [pred evaluateWithObject:CarNumber];
+    return isMatch;
+}
 /**
  输入框中只能输入数字和小数点，且小数点只能输入一位，参数number 可以设置小数的位数，该函数在-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string调用；
  */
@@ -169,4 +189,11 @@
         return YES;
     }
 }
++ (BOOL)isUrlWithString:(NSString *)urlString
+{
+    NSString *      regex = @"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]";
+    NSPredicate *   pred = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    
+    return [pred evaluateWithObject:urlString];
+}  
 @end

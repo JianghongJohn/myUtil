@@ -7,16 +7,15 @@
 //
 
 #import "JHWebViewController.h"
-#import "JH_ShareView.h"
 @import WebKit;
 
 #define kWebViewEstimatedProgress @"estimatedProgress"
-#define kBackImageName @"backItemImage"
-#define kBackImageNameHL @"backItemImageHL"
+#define kBackImageName @"button_back"
+#define kBackImageNameHL @"button_back"
 #define kNavHeight 64.f
 #define kItemSize 44.f
 #define kBackWidth 46.f
-#define kProgressDefaultTintColor [UIColor redColor]
+#define kProgressDefaultTintColor [UIColor orangeColor]
 
 //扩展
 @interface NSArray (Extension)
@@ -81,12 +80,13 @@
 - (WKWebView *)webView{
     if (!_webView) {
         
-        _webView = [[WKWebView alloc]initWithFrame:CGRectMake(0, kTopBarHeight, SCREENWIDTH, SCREENHEIGHT-kTopBarHeight)];
+        _webView = [[WKWebView alloc]initWithFrame:CGRectMake(0, self.navBar.bottom,
+                                                              self.view.bounds.size.width, self.view.bounds.size.height-self.navBar.bottom)];
         //打开右滑回退功能
         _webView.allowsBackForwardNavigationGestures = true;
         //有关导航事件的委托代理
         _webView.navigationDelegate = self;
-        _webView.scrollView.delegate = self;
+//        _webView.scrollView.delegate = self;
     }
     return _webView;
 }
@@ -96,9 +96,9 @@
         _urlLabel.numberOfLines = 0;
         _urlLabel.lineBreakMode = NSLineBreakByCharWrapping;
         _urlLabel.textAlignment = NSTextAlignmentCenter;
-        _urlLabel.font      = SYSFONT12;
+        _urlLabel.font      = [UIFont systemFontOfSize:12];
         _urlLabel.textColor = [UIColor darkGrayColor];
-        _urlLabel.center    = CGPointMake(self.view.size.width/2, 20+kTopBarHeight);
+        _urlLabel.center    = CGPointMake(self.view.size.width/2, 20+self.navBar.bottom);
         
     }
     return _urlLabel;
@@ -107,7 +107,7 @@
     if (!_progressView) {
         
         _progressView = [[UIProgressView alloc]initWithProgressViewStyle:UIProgressViewStyleDefault];
-        _progressView.frame = CGRectMake(0, kNavHeight - 1.5, self.view.bounds.size.width, 1.5);
+        _progressView.frame = CGRectMake(0, self.navBar.bottom - 1.5, self.view.bounds.size.width, 1);
         _progressView.tintColor = self.progressTintColor;
         [self.navigationController.view addSubview:_progressView];
         
@@ -151,19 +151,16 @@
         back.frame = CGRectMake(0, 0, kBackWidth, kItemSize);
         back.tintColor = self.navigationController.navigationBar.tintColor;
         [back addTarget:self action:@selector(back:) forControlEvents:UIControlEventTouchUpInside];
-        //back.backgroundColor = [UIColor lightGrayColor];
         _backItem = [[UIBarButtonItem alloc]initWithCustomView:back];
-        
+
     }
     return _backItem;
 }
 
 -(UIBarButtonItem *)shareItem{
     if (!_shareItem) {
-        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 25, 25)];
-        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:button];
-        [button addTarget:self action:@selector(_shareAction) forControlEvents:UIControlEventTouchUpInside];
-        [button setImage:[UIImage imageCompressWithSimple:UIIMAGE(@"分享") scaledToSize:CGSizeMake(20, 20)] forState:0];
+        
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"info_button"] style:UIBarButtonItemStylePlain target:self action:@selector(_shareAction)];
         _shareItem = item;
     }
     return _shareItem;
@@ -172,42 +169,17 @@
  *  分享
  */
 -(void)_shareAction{
-    JH_ShareView *share = [[JH_ShareView alloc] initWithFrame:CGRectMake(0,SCREENHEIGHT-SCREENWIDTH/4, SCREENWIDTH, SCREENWIDTH/4)];
-    
-    
-    share.webUrl = [NSString stringWithFormat:@"%@%@%@",BaseURL,BaseActivityShareURL,[NSString stringWithFormat:@"%@",self.activeId]];
-    [self.view addSubview:share];
+    DLog(@"%@",_webView.URL.absoluteString);
 }
 
 - (void)viewDidLoad{
     
     [super viewDidLoad];
-    
+    self.navItem.title = _webTitle;
     [self.view addSubview: self.urlLabel];
     [self.view addSubview: self.webView];
-
-    //加载请求
-    if (![self.urlString isKindOfClass:[NSNull class]]&&self.urlString!=nil&&![self.urlString isEqualToString:@""]) {
-        /**
-         webviewProgress
-         */
-        NSURL *url = [NSURL URLWithString:_urlString];
-        NSURLRequest *reuqest = [NSURLRequest requestWithURL:url];
-        [self.webView loadRequest:reuqest];
-        //为webView添加url展示
-    }
-    /**
-     *  如果是含有html源码，将直接加载html源码
-     */
-    if (![self.tpl isKindOfClass:[NSNull class]]&&self.tpl!=nil) {
-        
-        
-        [self.webView loadHTMLString:_tpl baseURL:nil];
-        
-    }
     //监听estimatedProgress
     [self.webView addObserver:self forKeyPath:kWebViewEstimatedProgress options:NSKeyValueObservingOptionNew context:nil];
-    
     //隐藏progressView
     self.progressView.hidden = true;
     
@@ -215,11 +187,31 @@
     self.leftItems = [NSMutableArray arrayWithObject:self.backItem];
     
     self.closeItem.tintColor = self.navigationController.navigationBar.tintColor;
-    //分享按钮
-    if (self.activeId) {
-    
-        self.navigationItem.rightBarButtonItem = self.shareItem;
+    //加载请求
+    if (![self.urlString isKindOfClass:[NSNull class]]&&self.urlString!=nil&&![self.urlString isEqualToString:@""]) {
+        if ([JHCheckUtil isUrlWithString:self.urlString]) {
+
+            NSURL *url = [NSURL URLWithString:_urlString];
+            NSURLRequest *reuqest = [NSURLRequest requestWithURL:url];
+            [self.webView loadRequest:reuqest];
+            //为webView添加url展示
+        }else{
+            return;
+        }
+        
     }
+    /**
+     *  如果是含有html源码，将直接加载html源码
+     */
+    if (![self.tpl isKindOfClass:[NSNull class]]&&self.tpl!=nil) {
+        
+//        NSString *headerString = @"<header><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></header>";
+        NSString *headerString = @"";
+        [self.webView loadHTMLString:[headerString stringByAppendingString:_tpl] baseURL:nil];
+        
+    }
+    //右侧更多按钮
+//    self.navItem.rightBarButtonItem = self.shareItem;
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -244,18 +236,18 @@
 }
 
 - (void)setLeftItems{
-    self.navigationItem.leftBarButtonItems = _leftItems;
+    self.navItem.leftBarButtonItems = _leftItems;
 }
 
 - (void)showCloseItem{
-    NSLog(@"Show");
+    DLog(@"Show");
     if (![_leftItems exsit:_closeItem]) {
         [self.leftItems addObject:_closeItem];
     }
     [self setLeftItems];
 }
 - (void)hiddenCloseItem{
-    NSLog(@"Hidden");
+    DLog(@"Hidden");
     if ([_leftItems exsit:_closeItem]) {
         [self.leftItems removeObject:_closeItem];
     }
@@ -310,7 +302,8 @@
     
     
     _progressView.hidden = true;
-    self.title = _webView.title;
+
+    self.navItem.title = _webView.title&&![_webView.title isEqualToString:@""]?_webView.title:_webTitle;
     NSArray *arr1;
     NSArray *arr2;
     @try {
@@ -318,7 +311,7 @@
         arr2 = [arr1[1] componentsSeparatedByString:@"/"];
         
     } @catch (NSException *exception) {
-        arr2 = @[@"未知的网页地址"];
+        arr2 = @[@"浩韵控股集团"];
     } @finally {
         self.urlLabel.text  = [NSString stringWithFormat:@"网页由%@提供",arr2[0]];
     }
@@ -340,24 +333,6 @@
     _progressView.hidden = true;
     
 }
-
-/**
- 滚动的时候监听为了实现让往下移动的时候，让web中的nav跟着移动(有bug暂时不做)
-
- @param scrollView UIScrollView
- */
-
-//-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-//    
-//    
-//    if (scrollView.contentOffset.y<0) {
-//        
-//        CGFloat offset = scrollView.contentOffset.y;
-//
-//        self.wkContentView.top = -offset;
-//    }
-//    
-//}
 
 
 

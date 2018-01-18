@@ -16,7 +16,9 @@ typedef NS_ENUM(NSInteger ,HttpMethod) {
 @interface JH_NetWorking : NSObject
 @property(nonatomic,strong)AFHTTPSessionManager *sessionManager;
 +(JH_NetWorking *)shareNetWorking;
-//添加请求必备项
+/**
+ 添加请求必备项
+ */
 +(NSDictionary *)addBaseKeyWithData:(NSDictionary *)data isLogin:(BOOL)isLogin;
 /**
  MD5加密
@@ -28,15 +30,49 @@ typedef NS_ENUM(NSInteger ,HttpMethod) {
 /**
  下载数据
  */
-+(void)downloadFile:(NSString *)urlString fileName:(NSString *)fileName;
-
-//使用普通keyvalue的网络请求
++(void)downloadFile:(NSString *)urlString fileName:(NSString *)fileName completionHandler:(void (^)())completionHandler;
+/**
+ 使用普通keyvalue的网络请求
+ @param urlString 完整url
+ @param method 请求方法
+ @param showHud 是否展示进度条
+ @param params 参数
+ @param completionblock 成功回调
+ @param errorblock 失败回调
+ */
 + (void)requestData:(NSString *)urlString HTTPMethod:(HttpMethod )method showHud:(BOOL)showHud params:(NSDictionary *)params completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock;
-//利用json方式的网络请求
+/**
+ http网络请求（使用Json方式）
+ 
+ @param urlString 完整url
+ @param method 请求方法
+ @param showHud 是否展示进度条
+ @param params 参数
+ @param completionblock 成功回调
+ @param errorblock 失败回调
+ */
 + (void)requestDataByJson:(NSString *)urlString HTTPMethod:(HttpMethod )method  showHud:(BOOL)showHud params:(NSDictionary *)params completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock;
-//上传附件的网络请求
+/**
+ 上传附件的网络请求
+ 
+ @param urlString 完整url
+ @param method 请求方法
+ @param params 参数
+ @param completionblock 成功回调
+ @param errorblock 失败回调
+ */
 + (void)requestDataAndFormData:(NSString *)urlString HTTPMethod:(HttpMethod )method  params:(NSDictionary *)params formDataArray:(NSArray *)formDataArray completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock;
-//自定义安全策略
++ (void)requestDataAndFormDataWithNoHud:(NSString *)urlString HTTPMethod:(HttpMethod )method  params:(NSDictionary *)params formDataArray:(NSArray *)formDataArray completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock;
+/**
+ 自定义安全策略
+ */
 + (AFSecurityPolicy*)customSecurityPolicy;
-
+/**
+ fastfds统一删除删除文件
+ */
++ (void)_deleteFileWithArray:(NSArray *)files withComplationHandle:(void(^)())completionBlock;
+/**
+ 同步请求
+ */
++(id)sendSynchronousRequest:(NSString *)urlString HTTPMethod:(HttpMethod )method  params:(NSDictionary *)params;
 @end

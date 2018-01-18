@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
-@interface JHWebViewController : UIViewController
+#import "ZSXCBaseNavViewController.h"
+@interface JHWebViewController : ZSXCBaseNavViewController
 @property (nonatomic,copy)NSString * urlString;
 @property (nonatomic,strong)UIColor * progressTintColor;
 @property(nonatomic,copy)NSString *tpl;
-@property(nonatomic,copy)NSString *activeId;
+@property(nonatomic,copy)NSString *webTitle;
 @end

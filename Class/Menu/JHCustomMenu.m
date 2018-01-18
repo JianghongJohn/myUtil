@@ -29,12 +29,13 @@
         if (rowHeight <= 0) {
             rowHeight = 44;
         }
+        CGFloat maxHeight = rowHeight *10;
         self.backgroundColor = [UIColor clearColor];
         self.origin = origin;
         self.rowHeight = rowHeight;
         self.viewWidth = width;
         self.arrData = [dataArr copy];
-        self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(origin.x + LeftToView, origin.y + TopToView, width, rowHeight * dataArr.count) style:UITableViewStylePlain];
+        self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(origin.x + LeftToView, origin.y + TopToView, width,  dataArr.count >10 ?maxHeight:rowHeight * dataArr.count ) style:UITableViewStylePlain];
         _tableView.dataSource = self;
         _tableView.delegate = self;
         [self addSubview:_tableView];

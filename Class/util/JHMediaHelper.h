@@ -36,4 +36,21 @@
  @param completion 成功回调
  */
 + (void)getMediaInfoFromAsset: (PHAsset *)asset completion: (void(^)(NSString *name, id pathData))completion;
+
+/**
+ 根据视频的URL来获取视频封面截图
+ 
+ @param videoURL 视频URL
+ @param enableSave 是否将封面截图保存到本地
+ @return 返回封面截图
+ */
++ (UIImage *)imageWithVideoURL: (NSURL *)videoURL enableSave: (BOOL)enableSave;
+
+/**
+ 转换视频格式从mov到MP4
+ 
+ @param path 视频路径
+ @param newPath 视频本地存放位置
+ */
++ (void)changeMOVToMP4WithPath:(NSString *)path avAsset:(AVAsset *)avAsset toPath:(NSString *)newPath completion: (void(^)(NSString *name, id pathData))completion;
 @end

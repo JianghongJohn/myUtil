@@ -46,7 +46,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         [self _setAttributeWithImageUrl:imageUrl];
-//        [self _setOneTapGesture];
+        [self _setOneTapGesture];
         [self _setDoubleTapGesture];
     }
     return self;
@@ -63,12 +63,12 @@
     [self addSubview:self.scrollView];
     [self.scrollView addSubview:self.imageView];
     [self.imageView sd_setShowActivityIndicatorView:YES];
-//    [self.imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:@"p1.jpg"] completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-//        
-//        weakSelf.imageSize = CGSizeMake(image.size.width, image.size.height);
-//        weakSelf.imageView.frame = CGRectMake(0, 0, _imageSize.width,_imageSize.height);
-//        [weakSelf remakeScale];
-//    }];
+    [self.imageView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:kBasePlaceholdImage] completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+        
+        weakSelf.imageSize = CGSizeMake(image.size.width, image.size.height);
+        weakSelf.imageView.frame = CGRectMake(0, 0, _imageSize.width,_imageSize.height);
+        [weakSelf remakeScale];
+    }];
     
     [UIView animateWithDuration:JH_UIViewAnimation animations:^{
         self.alpha = 1;
@@ -209,7 +209,11 @@
  点击事件，关闭视图
  */
 -(void)_tapAction{
-    _dismissBlock();
+    [UIView animateWithDuration:JH_UIViewAnimation animations:^{
+        self.alpha = 0;
+    } completion:^(BOOL finished) {
+        _dismissBlock();
+    }];
 }
 /**
  双击

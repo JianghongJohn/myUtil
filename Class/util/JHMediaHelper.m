@@ -12,7 +12,7 @@
 
 + (void)getImageInfoFromImage: (UIImage *)image PHAsset: (PHAsset *)asset completion: (void(^)(NSString *name, NSData *data))completion {
     //图片名
-    NSString *imageName = [self getMediaNameWithPHAsset:asset extensionName:@"IMG.PNG"];
+    NSString *imageName = [self getMediaNameWithPHAsset:asset extensionName:@"IMG.JPG"];
     NSData *imageData;
     if (UIImagePNGRepresentation(image) == nil)
     {
@@ -63,13 +63,13 @@
     
     if (asset.mediaType == PHAssetMediaTypeImage) {
         //图片文件名
-        mediaName = [self getMediaNameWithPHAsset:asset extensionName:@"Image.png"];
+        mediaName = [self getMediaNameWithPHAsset:asset extensionName:@"Image.jpg"];
         PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
         options.version = PHImageRequestOptionsVersionCurrent;
         //返回图片的质量类型 （效率高，质量低）
         options.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
         //同步请求获取iCloud图片（默认为NO）
-        //options.synchronous = YES;
+        options.synchronous = YES;
         
         [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
             data = [NSData dataWithData:imageData];
@@ -85,13 +85,30 @@
         mediaName = [self getMediaNameWithPHAsset:asset extensionName:@"IMG.MOV"];
         
         NSString *videoPath = [NSTemporaryDirectory() stringByAppendingString:mediaName];
+        
         BOOL success = [[NSFileManager defaultManager] fileExistsAtPath:videoPath];
         //当前处理方式：本地的视频 直接返回路径，非本地的也不存储到本地，直接返回data
         if (success) {
             !completion ?  : completion(mediaName, videoPath);
         }else{
-            NSData *videoData = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:videoPath]];
-            !completion ?  : completion(mediaName, videoData);
+            NSData *videoData = [NSData dataWithContentsOfFile:videoPath];
+            if (videoData==nil) {
+                PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+                options.version = PHImageRequestOptionsVersionCurrent;
+                options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+                PHImageManager *manager = [PHImageManager defaultManager];
+                [manager requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+                    AVURLAsset *urlAsset = (AVURLAsset *)asset;
+                    
+                    NSURL *url = urlAsset.URL;
+                    NSData *data = [NSData dataWithContentsOfURL:url];
+                    
+                    !completion ?  : completion(mediaName, data);
+                }];
+            }else{
+                
+                !completion ?  : completion(mediaName, videoData);
+            }
         }
     }
 }
@@ -140,7 +157,7 @@
     AVAssetImageGenerator *imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:urlAsset];
     
     //3、定义获取0帧处的视频截图
-    CMTime time = CMTimeMake(1,10);//缩略图创建时间 CMTime是表示电影时间信息的结构体，第一个参数表示是视频第几秒，第二个参数表示每秒帧数.(如果要活的某一秒的第几帧可以使用CMTimeMake方法)
+    CMTime time = CMTimeMake(0.0,10);//缩略图创建时间 CMTime是表示电影时间信息的结构体，第一个参数表示是视频第几秒，第二个参数表示每秒帧数.(如果要活的某一秒的第几帧可以使用CMTimeMake方法)
     NSError *error = nil;
     CMTime actucalTime; //缩略图实际生成的时间
     
@@ -158,5 +175,51 @@
     }
     CGImageRelease(cgImage);
     return image;
+}
+
+/**
+ 转换视频格式从mov到MP4
+
+ @param path 视频路径
+ @param newPath 视频本地存放位置
+ */
++ (void)changeMOVToMP4WithPath:(NSString *)path avAsset:(AVAsset *)avAsset toPath:(NSString *)newPath completion: (void(^)(NSString *name, id pathData))completion{
+    if (!avAsset) {
+        
+        avAsset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:path] options:nil];
+    }
+    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+    
+    if ([compatiblePresets containsObject:AVAssetExportPresetLowQuality])
+        
+    {
+        
+        AVAssetExportSession *exportSession = [[AVAssetExportSession alloc]initWithAsset:avAsset presetName:AVAssetExportPresetPassthrough];
+        NSString *exportPath = [NSString stringWithFormat:@"%@/%@.mp4",
+                                [NSHomeDirectory() stringByAppendingString:@"/tmp"],
+                                newPath];
+        exportSession.outputURL = [NSURL fileURLWithPath:exportPath];
+        NSLog(@"%@", exportPath);
+        exportSession.outputFileType = AVFileTypeMPEG4;
+        [exportSession exportAsynchronouslyWithCompletionHandler:^{
+            
+            switch ([exportSession status]) {
+                case AVAssetExportSessionStatusFailed:
+                    NSLog(@"Export failed: %@", [[exportSession error] localizedDescription]);
+                    break;
+                case AVAssetExportSessionStatusCancelled:
+                    NSLog(@"Export canceled");
+                    break;
+                case AVAssetExportSessionStatusCompleted:
+                {
+                    NSLog(@"转换成功");
+
+                }
+                    break;
+                default:
+                    break;
+            }
+        }];
+    }
 }
 @end

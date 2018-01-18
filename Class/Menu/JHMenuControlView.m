@@ -46,7 +46,7 @@ static const CGFloat lineHeight = 2.0f;
 -(UIScrollView*)rootScrollView
 {
     if (!_rootScrollView) {
-        _rootScrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, CGRectGetHeight(self.bounds)+64, CGRectGetWidth(self.bounds), self.contentViewHeight)];
+        _rootScrollView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, CGRectGetMaxY(self.frame), CGRectGetWidth(self.bounds), self.contentViewHeight)];
         _rootScrollView.backgroundColor = [UIColor whiteColor];
         _rootScrollView.pagingEnabled = YES;
         _rootScrollView.delegate = self;
@@ -249,12 +249,17 @@ static const CGFloat lineHeight = 2.0f;
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
+/**
+ 停止滚动的时候重新设置滚动条位置
+ */
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     if ([self.rootScrollView isEqual:scrollView]) {
         CGFloat offsetX = scrollView.contentOffset.x;
         if (offsetX >= 0) {
             NSInteger index = offsetX / CGRectGetWidth(self.bounds);
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:_currentIndex inSection:0];
+            JHMenuControlCell *cell = (JHMenuControlCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+            [self resizeLineViewWihtCellFrame:cell.frame withLineSize:[self _getLineSizeByIndex:indexPath.item] animated:YES];
             if (self.currentIndex != index) {
                 [self deselectItemAtIndex:self.currentIndex];
                 self.currentIndex = index;
@@ -262,6 +267,57 @@ static const CGFloat lineHeight = 2.0f;
             }
         }
     }
+    
+}
+
+/**
+ 滚动的时候根据前后文字多少，动态改变长度
+ */
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if ([self.rootScrollView isEqual:scrollView]) {
+        CGFloat offsetX = scrollView.contentOffset.x;
+        if (offsetX >= 0) {
+            CGFloat cellOffsetX = offsetX/4;
+            
+            if (offsetX>_currentIndex *CGRectGetWidth(self.bounds)) {
+                _gotoIndex = _currentIndex+1>_titles.count-1?_titles.count-1:_currentIndex+1;
+            }else{
+                _gotoIndex = _currentIndex-1<0?0:_currentIndex-1;
+            }
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:_currentIndex inSection:0];
+            JHMenuControlCell *cell = (JHMenuControlCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+            CGRect frame = CGRectMake(cellOffsetX, cell.frame.origin.y, cell.frame.size.width, cell.frame.size.height);
+            [self resizeLineViewWihtCellFrame:frame withLineSize:[self changeLineSizeWithOffset:offsetX] animated:YES];
+        }
+        
+    }
+
+}
+
+/**
+ 根据偏移量和前后文本数据动态改变下划线长度
+
+ @param offsetX 偏移量
+ */
+-(CGSize )changeLineSizeWithOffset:(CGFloat )offsetX{
+    NSString *title1 = _titles[_currentIndex];
+    CGSize size1 = [title1 sizeWithAttributes:@{NSFontAttributeName:self.selectedFont}];
+    size1 = CGSizeMake(size1.width+20, CGRectGetHeight(self.bounds));
+    
+    NSString *title2 = _titles[_gotoIndex];
+    CGSize size2 = [title2 sizeWithAttributes:@{NSFontAttributeName:self.selectedFont}];
+    size2 = CGSizeMake(size2.width+20, CGRectGetHeight(self.bounds));
+    
+    //计算之间的差值和offset的余数
+    CGFloat persent = offsetX  / CGRectGetWidth(self.bounds);
+    NSInteger intPersent = offsetX  / CGRectGetWidth(self.bounds);
+    CGFloat floatPersent = persent - intPersent;
+    if (_currentIndex>_gotoIndex) {
+        floatPersent = 1-floatPersent;
+    }
+    CGSize newSize = CGSizeMake(size1.width+(size2.width-size1.width)*floatPersent, size1.height);
+    
+    return newSize;
 }
 
 

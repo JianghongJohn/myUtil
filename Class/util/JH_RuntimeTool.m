@@ -50,10 +50,10 @@
     [dic enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         if ([self checkIsExistPropertyWithInstance:instance verifyPropertyName:key]) {
             //kvc给属性赋值
-            NSLog(@"%@,%@",obj,key);
+            DLog(@"%@,%@",obj,key);
             [instance setValue:obj forKey:key];
         }else {
-            NSLog(@"不包含key=%@的属性",key);
+            DLog(@"不包含key=%@的属性",key);
         }
     }];
 
@@ -203,8 +203,8 @@
 /**
  获取类的实例方法列表：getter, setter, 对象方法等。但不能获取类方法
  
- @param class <#class description#>
- @return <#return value description#>
+ @param class Class
+ @return 数组
  */
 + (NSArray *)fetchMethodList:(Class)class {
     unsigned int count = 0;

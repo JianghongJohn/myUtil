@@ -12,14 +12,23 @@
 extern NSString *const JHChartViewX;
 extern NSString *const JHChartViewY;
 
-@interface JHChartView : UIView
-
+typedef void (^JHChartViewBlock) (NSInteger index);
+#import "JHMenuBtn.h"
+@interface JHChartView : UIView<JHMenuBtnDelegate>
+@property(nonatomic,strong)JHChartViewBlock chartBlock;
+@property(nonatomic,strong)JHMenuBtn *menuBtn;
+//选中按钮index
+@property(nonatomic,assign)NSInteger selectIndex;
+//按钮菜单
+@property(nonatomic,strong)NSArray *menuTitles;
 /**
  折线图表总体ScrollView、XY坐标、网格、折线
  */
 @property(nonatomic,weak)UIScrollView *scrollView;
 @property(nonatomic,weak)UIView *mainView;
 
+//当前日期
+@property(nonatomic,assign)NSInteger currentDate;
 //Y最大值
 @property(nonatomic,assign)NSInteger maxY;
 //Y组数
@@ -66,7 +75,10 @@ extern NSString *const JHChartViewY;
 @property(nonatomic,assign)CGFloat YLabelWidth;
 //坐标颜色
 @property (nonatomic, strong) UIColor *titlesColor;
-
+//y坐标单位
+@property (nonatomic,strong)UILabel *YunitLabel;
+//y坐标单位高度
+@property(nonatomic,assign)CGFloat YunitLabelHeight;
 
 - (instancetype)initWithFrame:(CGRect)frame withData:(NSArray <NSDictionary *> *)data;
 

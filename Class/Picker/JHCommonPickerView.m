@@ -13,8 +13,7 @@ static const CGFloat kButtonHeight = 40.0f;
 static const CGFloat krowHeight = 30.0f;
 static const CGFloat kButtonWidth = 75.0f;
 #define kpickerHeight [UIScreen mainScreen].bounds.size.height/3
-#define kkeyword @"text"
-#define kkeyValue @"value"
+
 @interface JHCommonPickerView ()<UIPickerViewDelegate,UIPickerViewDataSource>
 
 @property(nonatomic,strong)SelectDataBlock block;
@@ -35,6 +34,8 @@ static const CGFloat kButtonWidth = 75.0f;
     self = [super initWithFrame:CGRectZero];
     if (self) {
         self.titleArray = titleArray;
+        self.keyword = kkeyword;
+        self.keyValue = kkeyValue;
         //backGround
         self.frame = CGRectMake(0, 0, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -75,7 +76,7 @@ static const CGFloat kButtonWidth = 75.0f;
     [_btnBgView addSubview:_cancelButton];
     [_cancelButton setTitle:@"取消" forState:0];
 //    [_cancelButton.titleLabel setFont: [UIFont systemFontOfSize:16]];
-    [_cancelButton setTitleColor:[UIColor redColor] forState:0];
+    [_cancelButton setTitleColor:kBaseColor forState:0];
     
 //    _cancelButton.alpha = 0.7;
     [_cancelButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
@@ -84,7 +85,7 @@ static const CGFloat kButtonWidth = 75.0f;
     [_btnBgView addSubview:_certainButton];
     [_certainButton setTitle:@"确定" forState:0];
 //    [_certainButton.titleLabel setFont: [UIFont systemFontOfSize:16]];
-    [_certainButton setTitleColor:[UIColor redColor] forState:0];
+    [_certainButton setTitleColor:kBaseColor forState:0];
 //    _certainButton.alpha = 0.7;
     [_certainButton addTarget:self action:@selector(dismissWithCallback) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -170,7 +171,7 @@ static const CGFloat kButtonWidth = 75.0f;
 }
 -(NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component{
     
-    return _titleArray[row][kkeyValue];
+    return _titleArray[row][_keyValue];
     
 }
 
@@ -179,8 +180,14 @@ static const CGFloat kButtonWidth = 75.0f;
  */
 -(void)dismissWithCallback{
     if (self.block) {
+        @try {
+            _block(self.titleArray[[_pickerView selectedRowInComponent:0]][_keyword],self.titleArray[[_pickerView selectedRowInComponent:0]][_keyValue]);
+        } @catch (NSException *exception) {
+            
+        } @finally {
+            
+        }
         
-        _block(self.titleArray[[_pickerView selectedRowInComponent:0]][kkeyword],self.titleArray[[_pickerView selectedRowInComponent:0]][kkeyValue]);
     }
     [self dismiss];
 }

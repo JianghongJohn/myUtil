@@ -7,7 +7,7 @@ static const CGFloat kSeparatorHeight = 6.0f;
 static const CGFloat kTitleFontSize = 13.0f;
 static const CGFloat kButtonTitleFontSize = 18.0f;
 static const NSTimeInterval kAnimateDuration = 0.3f;
-
+#define ktitleColor [UIColor colorWithRed:21/255.f green:167/255.f blue:233/255.f alpha:1]
 @interface JHActionSheet ()
 
 /** block回调 */

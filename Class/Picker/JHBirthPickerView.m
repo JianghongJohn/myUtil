@@ -8,6 +8,7 @@
 
 #import "JHBirthPickerView.h"
 #import "UIViewExt.h"
+#import "NSString+ChangeTime.h"
 #define UIColorFromRGBA(rgbValue, alphaValue) [UIColor \
 colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
 green:((float)((rgbValue & 0x00FF00) >> 8))/255.0 \
@@ -86,7 +87,7 @@ static const CGFloat kButtonWidth = 75.0f;
     [_btnBgView addSubview:_cancelButton];
     [_cancelButton setTitle:@"取消" forState:0];
 
-    [_cancelButton setTitleColor:[UIColor redColor] forState:0];
+    [_cancelButton setTitleColor:kBaseColor forState:0];
     
     //    _cancelButton.alpha = 0.7;
     [_cancelButton addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
@@ -95,7 +96,7 @@ static const CGFloat kButtonWidth = 75.0f;
     [_btnBgView addSubview:_certainButton];
     [_certainButton setTitle:@"确定" forState:0];
 
-    [_certainButton setTitleColor:[UIColor redColor] forState:0];
+    [_certainButton setTitleColor:kBaseColor forState:0];
     //    _certainButton.alpha = 0.7;
     [_certainButton addTarget:self action:@selector(dismissWithCallback) forControlEvents:UIControlEventTouchUpInside];
 }
@@ -117,7 +118,10 @@ static const CGFloat kButtonWidth = 75.0f;
  */
 - (void)refreshWithBrith:(NSString *)birth{
     if (![self isVaildBirth:birth]) {
-        birth = @"1990-01-01";
+        //默认使用当前时间的年月日
+        NSTimeInterval time =  [[NSDate date] timeIntervalSince1970];
+        NSString *nowTime = [NSString changeTimeIntervalToDate:@(time)];
+        birth = nowTime;
     }
     if ([birth isKindOfClass:[NSString class]]) {
         NSDate* date = [self.formateter dateFromString:birth];

@@ -49,6 +49,10 @@
  */
 @property (nonatomic, assign) NSInteger currentIndex;
 /**
+ *  即将变成的Index
+ */
+@property (nonatomic, assign) NSInteger gotoIndex;
+/**
  *  分割线位置调整。总是居中显示  默认(0,3,2,3)
     分割线默认高度为3， left可调整宽度，top可调整高度，bottom可调整lineView的y值
  */

@@ -11,7 +11,7 @@
 
 
 
-#define LABEL_BUFFER_SPACE 30   // pixel buffer space between scrolling label
+#define LABEL_BUFFER_SPACE 100   // pixel buffer space between scrolling label
 #define DEFAULT_PIXELS_PER_SECOND 30
 #define DEFAULT_PAUSE_TIME 0.5f
 @end
@@ -45,8 +45,18 @@
     _imageView.center = CGPointMake(_imageView.center.x, self.frame.size.height/2);
     _imageView.image = [UIImage imageNamed:@"公告"];
     [self addSubview:_imageView];
+    //分割线
+    UIView *lineView = [UIView new];
+    [self addSubview:lineView];
+    [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(_imageView.mas_right).offset(8);
+        make.centerY.equalTo(_imageView);
+        make.height.equalTo(_imageView);
+        make.width.equalTo(@1);
+    }];
+    lineView.backgroundColor = kBaseLineColor;
     
-    _JHNoticeView = [[UIScrollView alloc] initWithFrame:CGRectMake(_imageView.frame.size.width+20, 0, self.frame.size.width-_imageView.frame.size.width-20, self.frame.size.height)];
+    _JHNoticeView = [[UIScrollView alloc] initWithFrame:CGRectMake(_imageView.right+10, 0, self.frame.size.width-_imageView.right-10, self.frame.size.height)];
     [self addSubview:_JHNoticeView];
     for (int i=0; i< NUM_LABELS; ++i){
         label[i] = [[UILabel alloc] init];
@@ -95,16 +105,17 @@
     
     isScrolling = NO;
     
-    if ([finished intValue] == 1 && label[0].frame.size.width > self.frame.size.width){
+    if ([finished intValue] == 1 && label[0].frame.size.width > (self.frame.size.width-_imageView.frame.size.width-20)){
         [self scroll];
     }
 }
 #else
 - (void)animationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context
 {
+    //需要注意的是动画会在viewController页面消失的时候停止，故此时finished为0
     isScrolling = NO;
-    
-    if ([finished intValue] == 1 && label[0].frame.size.width > self.frame.size.width){
+    if (label[0].frame.size.width >  (self.frame.size.width-_imageView.frame.size.width-20)){
+//    if ([finished intValue] == 1 && label[0].frame.size.width > self.frame.size.width){
         [NSTimer scheduledTimerWithTimeInterval:pauseInterval target:self selector:@selector(scroll) userInfo:nil repeats:NO];
     }
 }
@@ -115,7 +126,7 @@
 {
     // Prevent multiple calls
     if (isScrolling){
-        //      return;
+              return;
     }
     isScrolling = YES;
     
@@ -163,14 +174,14 @@
     }
     
     CGSize size;
-    size.width = label[0].frame.size.width + self.frame.size.width + LABEL_BUFFER_SPACE;
+    size.width = label[0].frame.size.width +  (self.frame.size.width-_imageView.frame.size.width-20)+ LABEL_BUFFER_SPACE;
     size.height = self.frame.size.height;
     _JHNoticeView.contentSize = size;
     
     [_JHNoticeView setContentOffset:CGPointMake(0,0) animated:NO];
     
     // If the label is bigger than the space allocated, then it should scroll
-    if (label[0].frame.size.width > self.frame.size.width){
+    if (label[0].frame.size.width >  (self.frame.size.width-_imageView.frame.size.width-20)){
         for (int i = 1; i < NUM_LABELS; ++i){
             label[i].hidden = NO;
         }
@@ -183,7 +194,8 @@
         // Center this label
         CGPoint center;
         center = label[0].center;
-        center.x = self.center.x - self.frame.origin.x;
+        //使label居中显示
+        center.x = self.center.x - self.frame.origin.x-(_imageView.frame.size.width+20)/2;
         label[0].center = center;
     }
     
@@ -196,7 +208,7 @@
     if ([text isEqualToString:label[0].text]){
         // But if it isn't scrolling, make it scroll
         // If the label is bigger than the space allocated, then it should scroll
-        if (label[0].frame.size.width > self.frame.size.width){
+        if (label[0].frame.size.width >  (self.frame.size.width-_imageView.frame.size.width-20)){
             [self scroll];
         }
         return;

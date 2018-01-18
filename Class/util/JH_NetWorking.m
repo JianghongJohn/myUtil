@@ -8,10 +8,10 @@
 
 #import "JH_NetWorking.h"
 #import "UUID.h"
-#import "NSString+MD5.h"
-#import "CarFinanceAppDelegate+StartAPP.h"
+#import "ZSXCAppDelegate+Start.h"
+#define errorMessage @"网络连接错误！"
 static JH_NetWorking *afsingleton = nil;
-static NSInteger timeout = 30;
+static NSInteger timeout = 60;
 @implementation JH_NetWorking
 
 #define KuserNeedLogout [responseObject[@"error"]isEqual:kLogoutCode1]||[responseObject[@"error"]isEqual:kLogoutCode2]||[responseObject[@"error"]isEqual:kLogoutCode3]
@@ -24,12 +24,22 @@ static NSInteger timeout = 30;
             afsingleton = [[super allocWithZone:nil]init];
             afsingleton.sessionManager = [AFHTTPSessionManager manager];
             afsingleton.sessionManager.requestSerializer.timeoutInterval = timeout;
-            //afsingleton.sessionManager.securityPolicy = [[self class] customSecurityPolicy];
+//            afsingleton.sessionManager.securityPolicy = [[self class] customSecurityPolicy];
         }
     }
     return afsingleton;
 }
 
+/**
+ http网络请求
+
+ @param urlString 完整url
+ @param method 请求方法
+ @param showHud 是否展示进度条
+ @param params 参数
+ @param completionblock 成功回调
+ @param errorblock 失败回调
+ */
 + (void)requestData:(NSString *)urlString HTTPMethod:(HttpMethod )method  showHud:(BOOL)showHud params:(NSDictionary *)params completionHandle:(void (^)(id))completionblock errorHandle:(void (^)(NSError *))errorblock{
     if (afsingleton==nil) {
         [[self class ] shareNetWorking];
@@ -88,7 +98,7 @@ static NSInteger timeout = 30;
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //hideMB
             [hud hideAnimated:YES];
-            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
             
         }];
@@ -111,11 +121,10 @@ static NSInteger timeout = 30;
             }
             
             
-            
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //hideMB
             [hud hideAnimated:YES];
-             [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+             [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
             
         }];
@@ -135,7 +144,7 @@ static NSInteger timeout = 30;
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //hideMB
             [hud hideAnimated:YES];
-            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
         }];
         
@@ -143,7 +152,16 @@ static NSInteger timeout = 30;
     
 }
 
-//利用json方式的网络请求
+/**
+ http网络请求（使用Json方式）
+ 
+ @param urlString 完整url
+ @param method 请求方法
+ @param showHud 是否展示进度条
+ @param params 参数
+ @param completionblock 成功回调
+ @param errorblock 失败回调
+ */
 + (void)requestDataByJson:(NSString *)urlString HTTPMethod:(HttpMethod )method  showHud:(BOOL)showHud params:(NSDictionary *)params completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock{
     
     if (afsingleton==nil) {
@@ -204,7 +222,7 @@ static NSInteger timeout = 30;
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //hideMB
             [hud hideAnimated:YES];
-            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
             
         }];
@@ -231,7 +249,7 @@ static NSInteger timeout = 30;
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //hideMB
             [hud hideAnimated:YES];
-            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
             
         }];
@@ -252,13 +270,22 @@ static NSInteger timeout = 30;
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //hideMB
             [hud hideAnimated:YES];
-            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
         }];
         
     }
 }
-//上传附件的网络请求
+/**
+ 上传附件的网络请求
+ 
+ @param urlString 完整url
+ @param method 请求方法
+ @param params 参数
+ @param completionblock 成功回调
+ @param errorblock 失败回调
+ */
+
 + (void)requestDataAndFormData:(NSString *)urlString HTTPMethod:(HttpMethod )method  params:(NSDictionary *)params formDataArray:(NSArray *)formDataArray completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock{
     if (afsingleton==nil) {
         [[self class ] shareNetWorking];
@@ -266,15 +293,21 @@ static NSInteger timeout = 30;
     //编码
     urlString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     
-    MBProgressHUD *hud = [MBProgressHUD MBProgressShowProgressWithTitle:@"正在上传..." view:nil];
+    MBProgressHUD *hud = [MBProgressHUD MBProgressShowProgressViewWithTitle:@"正在上传..." view:nil];
     //发送异步网络请求
     
 //    [afsingleton.sessionManager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept" ];
     //    [manager.requestSerializer setValue:@"application/json; charset=gb2312" forHTTPHeaderField:@"Content-Type" ];
-    afsingleton.sessionManager.requestSerializer = [AFHTTPRequestSerializer serializer];
+//    afsingleton.sessionManager.requestSerializer = [AFHTTPRequestSerializer serializer];
     
 //    afsingleton.sessionManager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/json", @"text/json",@"text/html", @"text/plain",nil];
-    afsingleton.sessionManager.requestSerializer.timeoutInterval = timeout;
+//    afsingleton.sessionManager.requestSerializer.timeoutInterval = timeout;
+    AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
+    // 是否允许,NO-- 不允许无效的证书
+    [securityPolicy setAllowInvalidCertificates:YES];
+    [securityPolicy setValidatesDomainName:NO];
+    
+    afsingleton.sessionManager.securityPolicy = securityPolicy;
     //设置请求头
     //获取token、userId
     NSMutableDictionary *finalBody = [[NSMutableDictionary alloc]initWithDictionary:params];
@@ -344,27 +377,107 @@ static NSInteger timeout = 30;
             }
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             [hud hideAnimated:YES];
-            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:@"网络连接失败！" view:nil];
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
             errorblock(error);
         }];
     }
     
 }
++ (void)requestDataAndFormDataWithNoHud:(NSString *)urlString HTTPMethod:(HttpMethod )method  params:(NSDictionary *)params formDataArray:(NSArray *)formDataArray completionHandle:(void(^)(id result))completionblock errorHandle:(void(^)(NSError *error))errorblock{
+    if (afsingleton==nil) {
+        [[self class ] shareNetWorking];
+    }
+    //编码
+    urlString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    //发送异步网络请求
 
+    AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
+    // 是否允许,NO-- 不允许无效的证书
+    [securityPolicy setAllowInvalidCertificates:YES];
+    [securityPolicy setValidatesDomainName:NO];
+    
+    afsingleton.sessionManager.securityPolicy = securityPolicy;
+    //设置请求头
+    //获取token、userId
+    NSMutableDictionary *finalBody = [[NSMutableDictionary alloc]initWithDictionary:params];
+    if (finalBody[kdevId]) {
+        
+        [afsingleton.sessionManager.requestSerializer setValue: params[kdevId] forHTTPHeaderField:kdevId ];
+        [finalBody removeObjectForKey:kdevId];
+    }
+    if (finalBody[ktime]) {
+        
+        [afsingleton.sessionManager.requestSerializer setValue: params[ktime] forHTTPHeaderField:ktime ];
+        [finalBody removeObjectForKey:ktime];
+    }
+    if (finalBody[@"key"]) {
+        [finalBody removeObjectForKey:@"key"];
+    }
+    //GET和POST分别处理
+    if (method == HttpMethodGet) {
+        
+        [afsingleton.sessionManager GET:urlString parameters:finalBody progress:^(NSProgress * _Nonnull downloadProgress) {
+            
+        } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+            
+            //判断是否登录过期
+            if (KuserNeedLogout) {
+                [[self class]goToLoginWithMessage:responseObject[@"message"]];
+            } else {
+                
+                //block回调
+                completionblock(responseObject);
+            }
+            
+            
+            
+            
+        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            
+            
+            errorblock(error);
+            
+        }];
+        
+    }
+    else if(method == HttpMethodPost) {
+        [afsingleton.sessionManager POST:urlString parameters:finalBody constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+            //处理formData
+            for (NSDictionary *data in formDataArray) {
+                
+                [formData appendPartWithFileData:data[@"fileData"] name:data[@"name"] fileName:data[@"fileName"] mimeType:data[@"mimeType"]];
+            }
+            
+        } progress:^(NSProgress * _Nonnull uploadProgress) {
+
+        } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+
+            //判断是否登录过期
+            if (KuserNeedLogout) {
+                [[self class]goToLoginWithMessage:responseObject[@"message"]];
+            } else {
+                
+                //block回调
+                completionblock(responseObject);
+            }
+        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+
+            [MBProgressHUD MBProgressShowSuccess:NO WithTitle:errorMessage view:nil];
+            errorblock(error);
+        }];
+    }
+    
+}
 /**
  由于token过期造成的登录过期，强制退出
  */
 +(void)goToLoginWithMessage:(NSString *)message{
-    //删除保存的登录信息
-    [JH_FileManager removeObjectFromUserDefaultByKey:korgId];
-    [JH_FileManager removeObjectFromUserDefaultByKey:kNIMToken];
-    [JH_FileManager removeObjectFromUserDefaultByKey:ktoken];
-    
-    [JHAlertControllerTool alertTitle:@"提示" mesasge:message confirmHandler:^(UIAlertAction *action) {
-        CarFinanceAppDelegate *appdelegate = (CarFinanceAppDelegate *)[UIApplication sharedApplication].delegate;
+    [ZSXCUserManager userLogin:YES];
+    [JHAlertControllerTool alertTitle:@"提示" mesasge:message preferredStyle:1 confirmHandler:^(UIAlertAction *action) {
+        ZSXCAppDelegate *appdelegate = (ZSXCAppDelegate *)[UIApplication sharedApplication].delegate;
         [appdelegate _setLoginVC];
     } viewController:[UIApplication sharedApplication].keyWindow.rootViewController];
-    
+
     
 }
 
@@ -372,16 +485,16 @@ static NSInteger timeout = 30;
 + (AFSecurityPolicy*)customSecurityPolicy
 {
     // /先导入证书
-    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"xiaoxin" ofType:@"cer"];//证书的路径
+//    NSString *cerPath = [[NSBundle mainBundle] pathForResource:@"xiaoxin" ofType:@"cer"];//证书的路径
     //    NSString * cerPath = [[NSBundle mainBundle]pathForResource:@"https" ofType:@"cer"];
     
     //    NSLog(@"%@",cerPath);
-    NSData *certData = [NSData dataWithContentsOfFile:cerPath];
+//    NSData *certData = [NSData dataWithContentsOfFile:cerPath];
     //    NSLog(@"%@",certData);
     //    NSSet * certSet = [[NSSet alloc] initWithObjects:certData, nil];
     
     // AFSSLPinningModeCertificate 使用证书验证模式
-    AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
+    AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
     
     // allowInvalidCertificates 是否允许无效证书（也就是自建的证书），默认为NO
     // 如果是需要验证自建证书，需要设置为YES
@@ -393,7 +506,7 @@ static NSInteger timeout = 30;
     //如置为NO，建议自己添加对应域名的校验逻辑。
     securityPolicy.validatesDomainName = NO;
     
-    securityPolicy.pinnedCertificates = [NSSet setWithObjects:certData, nil];
+//    securityPolicy.pinnedCertificates = [NSSet setWithObjects:certData, nil];
     
     return securityPolicy;
 }
@@ -476,12 +589,27 @@ static NSInteger timeout = 30;
         //时间戳
         NSDate *now = [NSDate date];
         long timestamp = [now timeIntervalSince1970]*1000;
+        //用户信息
+        NSString *userId = [ZSXCUserManager getUserId];
+        NSString *orgId = [ZSXCUserManager getOrgId];
+        
+        [finalData setObject:userId forKeyedSubscript:kuserId];
+        [finalData setObject:orgId forKeyedSubscript:korgId];
+        
         [finalData setObject:[NSString stringWithFormat:@"%ld",timestamp] forKey:ktime];
         //key
         [finalData setObject:@"123456" forKey:@"key"];
         
     }else{
-
+        //设备Id
+        NSString *devid = [UUID getUUID];
+        [finalData setObject:devid forKey:kdevId];
+        //时间戳
+        NSDate *now = [NSDate date];
+        long timestamp = [now timeIntervalSince1970]*1000;
+        [finalData setObject:[NSString stringWithFormat:@"%ld",timestamp] forKey:ktime];
+        //key
+        [finalData setObject:@"123456" forKey:@"key"];
     }
     
     return finalData;
@@ -492,20 +620,35 @@ static NSInteger timeout = 30;
  */
 +(id)sendSynchronousRequest:(NSString *)urlString HTTPMethod:(HttpMethod )method  params:(NSDictionary *)params{
     
-    
+    //设置请求头
+    //获取token、userId
+    NSMutableDictionary *finalBody = [[NSMutableDictionary alloc]initWithDictionary:params];
+    if (finalBody[kdevId]) {
+        
+        [afsingleton.sessionManager.requestSerializer setValue: params[kdevId] forHTTPHeaderField:kdevId ];
+        [finalBody removeObjectForKey:kdevId];
+    }
+    if (finalBody[ktime]) {
+        
+        [afsingleton.sessionManager.requestSerializer setValue: params[ktime] forHTTPHeaderField:ktime ];
+        [finalBody removeObjectForKey:ktime];
+    }
+    if (finalBody[@"key"]) {
+        [finalBody removeObjectForKey:@"key"];
+    }
     //3.处理请求参数
     //key1=value1&key2=value2
     NSMutableString *paramString = [NSMutableString string];
     
-    NSArray *allKeys = params.allKeys;
+    NSArray *allKeys = finalBody.allKeys;
     
-    for (NSInteger i = 0; i < params.count; i++) {
+    for (NSInteger i = 0; i < finalBody.count; i++) {
         NSString *key = allKeys[i];
-        NSString *value = params[key];
+        NSString *value = finalBody[key];
         
         [paramString appendFormat:@"%@=%@",key,value];
         
-        if (i < params.count - 1) {
+        if (i < finalBody.count - 1) {
             [paramString appendString:@"&"];
         }
         
@@ -550,7 +693,7 @@ static NSInteger timeout = 30;
 
 #pragma mark - 下载数据
 
-+(void)downloadFile:(NSString *)urlString fileName:(NSString *)fileName{
++(void)downloadFile:(NSString *)urlString fileName:(NSString *)fileName completionHandler:(void (^)())completionHandler{
     
     NSURL *url = [NSURL URLWithString:urlString];
     //写入数据
@@ -575,14 +718,43 @@ static NSInteger timeout = 30;
         NSString *dirPath = [documentPath stringByAppendingPathComponent:@"DICTIONARY"];
         [JH_FileManager creatDir:dirPath];
         NSString *filePath = [dirPath stringByAppendingPathComponent:fileName];
-
+        //删除原文件，创建新文件
+        [JH_FileManager deleteFile:filePath];
         return [NSURL fileURLWithPath:filePath];
         
     } completionHandler:^(NSURLResponse * _Nonnull response, NSURL * _Nullable filePath, NSError * _Nullable error) {
         // filePath就是你下载文件的位置，你可以解压，也可以直接拿来使用
-        
+        completionHandler();
     }];
     [downloadTask resume];
+}
+
+/**
+ fastfds统一删除删除文件
+ */
++(void)_deleteFileWithArray:(NSArray *)files withComplationHandle:(void(^)())completionBlock{
+    NSString *filesString = [NSString DataTOjsonString:files];
+    NSDictionary *baseData = @{
+                               @"files":filesString
+                               };
+    
+    NSDictionary *tempData = [JH_NetWorking addBaseKeyWithData:baseData isLogin:YES];
+    //添加sign
+    NSString *sign = [JH_NetWorking Md5Param:tempData isLogin:YES];
+    
+    NSMutableDictionary *requestData = [[NSMutableDictionary alloc] initWithDictionary:tempData];
+    [requestData setObject:sign forKey:@"sign"];
+    
+    [JH_NetWorking requestData:[kBaseUrlStr stringByAppendingString:UTF8Char(ZSXC_api_file_delete.urlString)] HTTPMethod:ZSXC_api_file_delete.httpMethod showHud:NO params:requestData completionHandle:^(id result) {
+        
+        if ([result[@"error"] isEqual:@1]) {
+            completionBlock();
+        }else{
+            
+        }
+    } errorHandle:^(NSError *error) {
+        
+    }];
 }
 
 @end

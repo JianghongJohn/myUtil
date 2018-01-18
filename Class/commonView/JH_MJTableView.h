@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "JH_ViewModelFactory.h"
+#import <MJRefresh.h>
+
 @protocol JH_MJTableViewDelegate <NSObject>
 
 @optional
@@ -21,11 +22,15 @@
 -(void)JH_MJTableViewLoadMore;
 @end
 
-@interface JH_MJTableView : UITableView
+@interface JH_MJTableView : JHTableView
 @property(nonatomic,weak)id<JH_MJTableViewDelegate>JHDelegate;
-
+/**
+ 设置刷新控件头部和尾部
+ */
+-(void)_setRefresh;
 //添加刷新部件头部
-//-(void)_setMJRefreshHeader;
+-(void)_setMJRefreshHeader;
+
 /**
  用户选择开启上拉加载
  */
@@ -37,4 +42,8 @@
  @param refreshState JHRefreshState
  */
 -(void)refreshEnd:(JHRefreshState )refreshState;
+/**
+ 获取刷新样式
+ */
++(MJRefreshGifHeader *)getGifHeader:(void(^)())refreshingBlock;
 @end
